@@ -8,7 +8,7 @@ body:
       value: |
         Thanks for helping expand the Known Apps catalog!
         Each entry maps an app's **CFBundleIdentifier** to its **designated code requirement** (the string `codesign` produces).
-        Once merged, the app will appear in the dropdown at https://www.simsenblog.dk/pppc-builder/ — no install needed for users.
+        Once merged, the app will appear in the dropdown at https://macpppc.com — no install needed for users.
 
         **How to get the values:**
         ```bash
