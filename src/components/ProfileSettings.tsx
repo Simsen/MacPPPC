@@ -12,7 +12,7 @@ interface Props {
 }
 
 const inputCls =
-  'w-full bg-input/60 border border-border/60 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60 transition';
+  'w-full bg-input border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60 transition';
 
 export function ProfileSettings({ value, onChange, contextLabel, showPrivacyJustification }: Props) {
   function update<K extends keyof ProfileSettingsType>(
@@ -64,7 +64,7 @@ export function ProfileSettings({ value, onChange, contextLabel, showPrivacyJust
                 type="button"
                 onClick={() => update('payloadIdentifier', generateRandomUUID())}
                 title="Generate new UUID"
-                className="px-3 rounded-md border border-border/60 hover:bg-card-elevated text-muted-foreground hover:text-foreground transition"
+                className="px-3 rounded-md border border-border hover:bg-card-elevated text-muted-foreground hover:text-foreground transition"
               >
                 <RefreshCw className="w-4 h-4" />
               </button>
@@ -112,7 +112,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-1.5 tracking-wide uppercase">
+      <label className="block text-xs font-medium text-muted-foreground mb-1.5">
         {label}
         {optional && (
           <span className="text-muted-foreground/70 font-normal normal-case"> (optional)</span>

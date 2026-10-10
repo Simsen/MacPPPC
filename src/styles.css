@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
-@theme {
-  /* Theme tokens are defined inside :root / .dark below.
+@theme inline {
+  /* Theme tokens are defined inside :root / .dark below. `inline` makes
+     utilities read var(--card) etc. directly, so scoped overrides like
+     .code-surface take effect.
      These @theme declarations register the names so Tailwind utilities like
      bg-background and text-foreground resolve to var(--color-*). */
   --color-background: var(--bg);
@@ -17,62 +19,82 @@
   --color-primary: var(--primary);
   --color-primary-strong: var(--primary-strong);
   --color-primary-foreground: var(--primary-fg);
+  --color-info: var(--info);
   --color-destructive: var(--destructive);
   --color-warning: var(--warning);
   --color-ring: var(--primary);
+  --color-code: var(--code-bg);
+  --color-code-chrome: var(--code-chrome);
 
-  --radius-xl: 1rem;
+  --radius-xl: 0.875rem;
   --radius-lg: 0.75rem;
   --radius-md: 0.5rem;
   --radius-sm: 0.375rem;
 
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-/* Light theme (default) */
+/* Light theme (default) — cool graphite neutrals, deep teal accent */
 :root {
-  --bg: oklch(0.98 0.005 250);
-  --fg: oklch(0.18 0.012 250);
+  --bg: oklch(0.975 0.004 250);
+  --fg: oklch(0.21 0.02 262);
   --card: oklch(1 0 0);
-  --card-elevated: oklch(0.965 0.006 250);
-  --border: oklch(0.90 0.008 250);
-  --border-strong: oklch(0.82 0.012 250);
-  --input: oklch(0.985 0.005 250);
-  --muted: oklch(0.95 0.006 250);
-  --muted-fg: oklch(0.48 0.012 250);
-  --primary: oklch(0.62 0.18 145);
-  --primary-strong: oklch(0.55 0.20 145);
+  --card-elevated: oklch(0.965 0.005 250);
+  --border: oklch(0.915 0.006 255);
+  --border-strong: oklch(0.85 0.01 255);
+  --input: oklch(0.985 0.003 250);
+  --muted: oklch(0.93 0.006 255);
+  --muted-fg: oklch(0.5 0.016 258);
+  --primary: oklch(0.52 0.1 182);
+  --primary-strong: oklch(0.46 0.095 182);
   --primary-fg: oklch(0.99 0 0);
-  --destructive: oklch(0.60 0.22 25);
-  --warning: oklch(0.72 0.16 80);
+  --info: oklch(0.5 0.13 265);
+  --destructive: oklch(0.56 0.2 25);
+  --warning: oklch(0.6 0.14 65);
 
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-lift: 0 6px 24px rgba(0, 0, 0, 0.10);
+  /* The code editor stays dark in both themes. */
+  --code-bg: oklch(0.2 0.015 262);
+  --code-chrome: oklch(0.24 0.016 262);
 
-  --bg-glow: oklch(0.85 0.10 145 / 0.18);
+  --shadow-soft: 0 1px 2px oklch(0.3 0.02 260 / 0.05), 0 2px 8px oklch(0.3 0.02 260 / 0.04);
+  --shadow-lift: 0 12px 32px oklch(0.3 0.02 260 / 0.14);
+
+  --bg-glow: oklch(0.9 0.05 182 / 0.35);
 }
 
-/* Dark theme */
-html.dark {
-  --bg: oklch(0.18 0.01 250);
-  --fg: oklch(0.97 0.005 250);
-  --card: oklch(0.22 0.012 250);
-  --card-elevated: oklch(0.24 0.012 250);
-  --border: oklch(0.30 0.012 250);
-  --border-strong: oklch(0.40 0.012 250);
-  --input: oklch(0.25 0.012 250);
-  --muted: oklch(0.28 0.012 250);
-  --muted-fg: oklch(0.68 0.01 250);
-  --primary: oklch(0.74 0.17 145);
-  --primary-strong: oklch(0.68 0.18 145);
-  --primary-fg: oklch(0.14 0 0);
-  --destructive: oklch(0.65 0.21 25);
-  --warning: oklch(0.78 0.15 80);
+/* Dark theme. .code-surface (the preview editor) reuses the dark tokens in
+   both themes so the code panel always reads as a dark editor. */
+html.dark,
+.code-surface {
+  --bg: oklch(0.17 0.008 262);
+  --fg: oklch(0.95 0.005 255);
+  --card: oklch(0.205 0.01 262);
+  --card-elevated: oklch(0.235 0.011 262);
+  --border: oklch(0.285 0.012 262);
+  --border-strong: oklch(0.37 0.014 262);
+  --input: oklch(0.18 0.009 262);
+  --muted: oklch(0.29 0.012 262);
+  --muted-fg: oklch(0.68 0.014 258);
+  --primary: oklch(0.79 0.12 180);
+  --primary-strong: oklch(0.72 0.12 180);
+  --primary-fg: oklch(0.18 0.03 185);
+  --info: oklch(0.74 0.11 265);
+  --destructive: oklch(0.68 0.18 25);
+  --warning: oklch(0.8 0.13 75);
 
-  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.18);
-  --shadow-lift: 0 4px 20px rgba(0, 0, 0, 0.35);
+  --code-bg: oklch(0.15 0.008 262);
+  --code-chrome: oklch(0.19 0.01 262);
 
-  --bg-glow: oklch(0.28 0.04 145 / 0.18);
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.3), 0 2px 8px oklch(0 0 0 / 0.2);
+  --shadow-lift: 0 12px 32px oklch(0 0 0 / 0.45);
+
+  --bg-glow: oklch(0.32 0.05 182 / 0.22);
+}
+
+.code-surface {
+  color: var(--fg);
+  color-scheme: dark;
 }
 
 html,
@@ -83,16 +105,27 @@ body,
 
 body {
   background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, var(--bg-glow), transparent 60%),
+    radial-gradient(ellipse 70% 40% at 50% -8%, var(--bg-glow), transparent 70%),
     var(--bg);
+  background-attachment: fixed;
   color: var(--fg);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 14px;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   color-scheme: light;
 }
 html.dark body {
   color-scheme: dark;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--primary) 25%, transparent);
+}
+
+:where(button, a, summary):focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--primary) 70%, transparent);
+  outline-offset: 2px;
 }
 
 ::-webkit-scrollbar {
@@ -105,15 +138,18 @@ html.dark body {
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--border-strong);
+  background-clip: padding-box;
 }
 
 .section-label {
-  font-size: 0.7rem;
+  font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted-fg);
 }

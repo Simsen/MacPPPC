@@ -123,13 +123,13 @@ export function DeploymentPanel({
           <button
             type="button"
             onClick={onOpenSignIn}
-            className="w-full p-3 rounded-md border border-primary/30 bg-primary/5 text-primary text-sm hover:bg-primary/10 transition"
+            className="w-full p-3.5 rounded-lg border border-dashed border-primary/40 bg-primary/[0.05] text-primary text-sm font-medium hover:bg-primary/10 transition"
           >
             Sign in to Intune to deploy directly
           </button>
         )}
         {!signedIn && !canSignIn && (
-          <div className="w-full p-3 rounded-md border border-border bg-card-elevated/40 text-muted-foreground text-xs">
+          <div className="w-full p-3 rounded-lg border border-border bg-card-elevated/40 text-muted-foreground text-xs">
             Direct deploy is disabled in this build. Use the Download button on
             the right to grab the generated <code>.mobileconfig</code> and
             upload manually to Intune.
@@ -149,14 +149,14 @@ export function DeploymentPanel({
           return (
             <div
               key={key}
-              className="rounded-md border border-border/60 bg-background/30"
+              className="rounded-xl border border-border bg-card overflow-hidden"
             >
-              <div className="flex items-center gap-2 px-3 py-2 border-b border-border/60">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-card-elevated/40">
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium truncate">
+                  <div className="text-sm font-semibold truncate">
                     {p.policyName}
                   </div>
-                  <div className="text-[11px] text-muted-foreground truncate">
+                  <div className="text-[11px] text-muted-foreground font-mono truncate mt-0.5">
                     {p.filename}
                   </div>
                 </div>
@@ -165,22 +165,22 @@ export function DeploymentPanel({
                     type="button"
                     onClick={() => copyToAll(key)}
                     title="Use this assignment for all policies"
-                    className="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground px-2 py-1 rounded-md hover:bg-card-elevated/60 transition"
+                    className="inline-flex items-center gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground px-2 py-1 rounded-md border border-border bg-card hover:border-border-strong transition"
                   >
                     <CopyIcon className="w-3 h-3" />
                     Copy to all
                   </button>
                 )}
               </div>
-              <div className="p-3 space-y-2">
+              <div className="p-4 space-y-3">
                 <AssignmentPicker
                   value={assignment}
                   onChange={(next) => updateAssignment(key, next)}
                   signedIn={signedIn}
                 />
                 {p.kind !== 'pppc' && (
-                  <div className="flex items-start gap-2 p-2 rounded-md bg-primary/5 text-muted-foreground text-[11px]">
-                    <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-primary" />
+                  <div className="flex items-start gap-2 p-3 rounded-lg border border-info/25 bg-info/[0.06] text-muted-foreground text-xs">
+                    <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-info" />
                     <span>
                       macOS 27 DDM declaration — Apple applies it per user, so
                       assign it to user groups. For a mixed fleet, deploy a
@@ -190,7 +190,7 @@ export function DeploymentPanel({
                   </div>
                 )}
                 {!valid && (
-                  <div className="flex items-center gap-2 p-2 rounded-md bg-warning/10 text-warning text-xs">
+                  <div className="flex items-center gap-2 p-2.5 rounded-lg border border-warning/30 bg-warning/10 text-warning text-xs">
                     <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
                     <span>Add at least one group to enable deployment.</span>
                   </div>
@@ -206,10 +206,10 @@ export function DeploymentPanel({
             onClick={() => void deploy()}
             disabled={!canDeploy}
             className={cn(
-              'inline-flex items-center gap-2 px-4 py-2 text-sm rounded-md font-medium transition shadow-sm',
+              'inline-flex items-center gap-2 px-5 py-2.5 text-sm rounded-lg font-semibold transition',
               canDeploy
-                ? 'bg-primary text-primary-foreground hover:bg-primary-strong'
-                : 'bg-card-elevated/40 text-muted-foreground cursor-not-allowed',
+                ? 'bg-primary text-primary-foreground hover:bg-primary-strong shadow-sm'
+                : 'border border-border bg-card-elevated/40 text-muted-foreground cursor-not-allowed',
             )}
           >
             {deploying ? (
@@ -238,10 +238,10 @@ export function DeploymentPanel({
               <div
                 key={i}
                 className={cn(
-                  'flex items-start gap-2 p-2.5 rounded-md text-xs border',
+                  'flex items-start gap-2.5 p-3 rounded-lg text-xs border',
                   r.status === 'failed'
-                    ? 'bg-destructive/5 border-destructive/30 text-destructive'
-                    : 'bg-primary/5 border-primary/20 text-foreground',
+                    ? 'bg-destructive/[0.06] border-destructive/30 text-destructive'
+                    : 'bg-primary/[0.05] border-primary/25 text-foreground',
                 )}
               >
                 {r.status === 'failed' ? (
@@ -267,7 +267,7 @@ export function DeploymentPanel({
                     href={r.portalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-primary hover:underline text-[11px] flex-shrink-0"
+                    className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-primary/30 text-primary font-medium hover:bg-primary/10 text-[11px] flex-shrink-0 transition"
                   >
                     Open
                     <ExternalLink className="w-3 h-3" />

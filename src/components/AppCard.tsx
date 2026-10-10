@@ -12,6 +12,7 @@ import type {
   SelectedApp,
 } from '@/lib/types';
 import { PermissionRow } from './PermissionRow';
+import { Switch } from './Card';
 import { cn } from '@/lib/cn';
 
 interface Props {
@@ -51,12 +52,12 @@ export function AppCard({
   const enabledCount = visibleIds.filter((id) => item.permissions[id]?.enabled).length;
 
   return (
-    <div className="rounded-lg border border-border/60 bg-card-elevated/30 overflow-hidden transition hover:border-border-strong/50">
+    <div className={cn('rounded-xl border bg-card overflow-hidden transition', item.expanded ? 'border-border-strong shadow-[var(--shadow-soft)]' : 'border-border hover:border-border-strong')}>
       <div className="flex items-stretch">
         <button
           type="button"
           onClick={onToggleExpanded}
-          className="flex-1 min-w-0 flex items-center gap-3 p-4 text-left hover:bg-card-elevated/60 transition"
+          className="flex-1 min-w-0 flex items-center gap-3 px-4 py-3.5 text-left hover:bg-card-elevated/50 transition"
           aria-expanded={item.expanded}
         >
           <div className="text-muted-foreground">
@@ -66,31 +67,31 @@ export function AppCard({
               <ChevronRight className="w-4 h-4" />
             )}
           </div>
-          <div className="w-9 h-9 rounded-md bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
-            <AppWindow className="w-4 h-4" />
+          <div className="w-10 h-10 rounded-[10px] bg-gradient-to-br from-primary/20 to-info/20 text-primary ring-1 ring-inset ring-primary/15 flex items-center justify-center flex-shrink-0 text-[15px] font-semibold">
+            {item.app.displayName.trim().charAt(0).toUpperCase() || <AppWindow className="w-4 h-4" />}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="font-medium truncate">{item.app.displayName}</span>
+              <span className="text-[15px] font-semibold tracking-tight truncate">{item.app.displayName}</span>
               {item.isKnownApp && (
-                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md bg-primary/10 text-primary font-semibold">
                   <ShieldCheck className="w-3 h-3" />
                   Known
                 </span>
               )}
             </div>
-            <div className="text-xs text-muted-foreground truncate font-mono">
+            <div className="text-xs text-muted-foreground truncate font-mono mt-0.5">
               {item.app.bundleId}
             </div>
           </div>
-          <span className="text-xs text-muted-foreground whitespace-nowrap tabular-nums">
-            {enabledCount} / {visibleIds.length}
+          <span className={cn('text-[11px] font-mono whitespace-nowrap tabular-nums px-2 py-1 rounded-md border', enabledCount > 0 ? 'border-primary/30 bg-primary/[0.07] text-primary' : 'border-border text-muted-foreground')}>
+            {enabledCount} / {visibleIds.length} enabled
           </span>
         </button>
         <button
           type="button"
           onClick={onRemove}
-          className="flex items-center justify-center px-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition"
+          className="flex items-center justify-center px-4 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition"
           aria-label="Remove app"
         >
           <Trash2 className="w-4 h-4" />
@@ -99,12 +100,12 @@ export function AppCard({
 
       <div
         className={cn(
-          'border-t border-border/60 transition-all',
+          'border-t border-border',
           !item.expanded && 'hidden',
         )}
       >
         {mode === 'separate' && (
-          <div className="p-4 bg-primary/[0.03] border-b border-border/60">
+          <div className="p-5 bg-primary/[0.03] border-b border-border">
             <div className="section-label mb-2">Profile metadata (this app)</div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
@@ -118,7 +119,7 @@ export function AppCard({
                     onChangeProfile({ ...item.profile, name: e.target.value })
                   }
                   placeholder={`PPPC - ${item.app.displayName}`}
-                  className="w-full text-sm bg-input/60 border border-border/60 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60"
+                  className="w-full text-sm bg-input border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60 transition"
                 />
               </div>
               <div>
@@ -135,7 +136,7 @@ export function AppCard({
                     })
                   }
                   placeholder="IT Department"
-                  className="w-full text-sm bg-input/60 border border-border/60 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60"
+                  className="w-full text-sm bg-input border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60 transition"
                 />
               </div>
               <div className="md:col-span-2">
@@ -152,7 +153,7 @@ export function AppCard({
                     })
                   }
                   placeholder="Optional"
-                  className="w-full text-sm bg-input/60 border border-border/60 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60"
+                  className="w-full text-sm bg-input border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60 transition"
                 />
               </div>
               <div className="md:col-span-2">
@@ -169,7 +170,7 @@ export function AppCard({
                         identifier: e.target.value,
                       })
                     }
-                    className="flex-1 text-xs font-mono bg-input/60 border border-border/60 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60"
+                    className="flex-1 text-xs font-mono bg-input border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60 transition"
                   />
                   <button
                     type="button"
@@ -180,7 +181,7 @@ export function AppCard({
                       })
                     }
                     title="Generate new UUID"
-                    className="px-2 rounded-md border border-border/60 hover:bg-card-elevated text-muted-foreground hover:text-foreground transition"
+                    className="px-2.5 rounded-lg border border-border hover:bg-card-elevated text-muted-foreground hover:text-foreground transition"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
                   </button>
@@ -189,13 +190,13 @@ export function AppCard({
             </div>
           </div>
         )}
-        <div className="p-4 bg-background/30 border-b border-border/60">
+        <div className="p-5 bg-card-elevated/40 border-b border-border">
           <div className="section-label mb-2">Code Requirement</div>
           <textarea
             value={item.app.codeRequirement ?? ''}
             onChange={(e) => onChangeCodeRequirement(e.target.value)}
             rows={3}
-            className="w-full text-[11px] font-mono bg-input/60 border border-border/60 rounded-md px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60 transition"
+            className="w-full text-[11px] leading-relaxed font-mono bg-input border border-border rounded-lg px-3 py-2.5 resize-y focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60 transition"
             placeholder={`identifier "${item.app.bundleId}" and anchor apple generic`}
           />
           {!item.app.codeRequirement && (
@@ -204,13 +205,13 @@ export function AppCard({
             </p>
           )}
         </div>
-        <div className="p-2 space-y-1">
+        <div className="p-3 space-y-1">
           {PERMISSION_CATEGORIES.map((cat) => {
             const perms = pppcPerms.filter((p) => p.category === cat.id);
             if (perms.length === 0) return null;
             return (
               <div key={cat.id}>
-                <div className="px-3 pt-3 pb-1 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+                <div className="section-label px-3 pt-3 pb-1.5">
                   {cat.label}
                 </div>
                 {perms.map((perm) => (
@@ -232,16 +233,16 @@ export function AppCard({
           })}
         </div>
         {target === '27' && (
-          <div className="border-t border-border/60 p-2">
+          <div className="border-t border-border p-3 bg-primary/[0.02]">
             <div className="px-3 pt-3 pb-1 flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+              <span className="section-label">
                 App Privacy
               </span>
-              <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+              <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-primary/10 text-primary font-semibold">
                 DDM · macOS 27
               </span>
             </div>
-            <p className="px-3 text-[11px] text-muted-foreground">
+            <p className="px-3 pb-1 text-xs text-muted-foreground">
               Enabled permissions are suggested as Allow in one consent prompt.
               The user can decline. Deployed as a separate Settings Catalog policy.
             </p>
@@ -267,7 +268,7 @@ export function AppCard({
                 value={item.privacyJustification}
                 onChange={(e) => onChangeJustification(e.target.value)}
                 placeholder={justificationPlaceholder}
-                className="w-full text-sm bg-input/60 border border-border/60 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60"
+                className="w-full text-sm bg-input border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60 transition"
               />
             </div>
           </div>
@@ -288,28 +289,12 @@ function AppPrivacyRow({
 }) {
   const [showTip, setShowTip] = useState(false);
   return (
-    <div className="p-3 rounded-md hover:bg-background/30 transition">
+    <div className={cn('px-3 py-3 rounded-lg transition', enabled ? 'bg-primary/[0.04]' : 'hover:bg-card-elevated/60')}>
       <div className="flex items-center gap-2">
-        <button
-          type="button"
-          onClick={onToggle}
-          role="switch"
-          aria-checked={enabled}
-          className={cn(
-            'relative inline-flex h-5 w-9 items-center rounded-full transition',
-            enabled ? 'bg-primary' : 'bg-muted',
-          )}
-        >
-          <span
-            className={cn(
-              'inline-block h-4 w-4 transform rounded-full bg-white transition',
-              enabled ? 'translate-x-4' : 'translate-x-0.5',
-            )}
-          />
-        </button>
-        <span className="font-medium">{perm.name}</span>
+        <Switch checked={enabled} onChange={onToggle} label={perm.name} />
+        <span className="text-sm font-medium">{perm.name}</span>
         {enabled && (
-          <span className="text-[10px] font-mono text-muted-foreground/70 px-1 py-0.5 rounded bg-muted/30">
+          <span className="text-[10px] font-mono text-primary px-1.5 py-0.5 rounded-md bg-primary/10">
             {perm.id === 'location' ? 'Always' : 'Allow'}
           </span>
         )}
@@ -325,14 +310,14 @@ function AppPrivacyRow({
           >
             <Info className="w-4 h-4" />
             {showTip && (
-              <span className="absolute left-6 top-0 z-10 w-72 p-2 rounded-md bg-card border border-border shadow-lg text-xs text-foreground">
+              <span className="absolute left-6 top-0 z-10 w-72 p-3 rounded-lg bg-card border border-border shadow-[var(--shadow-lift)] text-xs text-foreground">
                 {perm.tooltip}
               </span>
             )}
           </button>
         )}
       </div>
-      <p className="text-sm text-muted-foreground mt-1 ml-12">{perm.description}</p>
+      <p className="text-[13px] text-muted-foreground mt-1 ml-11">{perm.description}</p>
     </div>
   );
 }

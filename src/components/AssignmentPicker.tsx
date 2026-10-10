@@ -22,6 +22,7 @@ import type {
   GroupTarget,
 } from '@/lib/assignments';
 import { cn } from '@/lib/cn';
+import { Choice } from './Card';
 
 interface Props {
   value: AssignmentConfig;
@@ -60,33 +61,37 @@ export function AssignmentPicker({ value, onChange, signedIn }: Props) {
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-        <ModeChip
+        <Choice
+        compact
           active={value.mode === 'none'}
           onClick={() => setMode('none')}
           icon={<CircleSlash className="w-4 h-4" />}
-          label="No assignment"
-          sub="Create only"
+          title="No assignment"
+          subtitle="Create only"
         />
-        <ModeChip
+        <Choice
+        compact
           active={value.mode === 'allUsers'}
           onClick={() => setMode('allUsers')}
           icon={<Users className="w-4 h-4" />}
-          label="All users"
-          sub="Licensed users"
+          title="All users"
+          subtitle="Licensed users"
         />
-        <ModeChip
+        <Choice
+        compact
           active={value.mode === 'allDevices'}
           onClick={() => setMode('allDevices')}
           icon={<Laptop className="w-4 h-4" />}
-          label="All devices"
-          sub="Every enrolled Mac"
+          title="All devices"
+          subtitle="Every enrolled Mac"
         />
-        <ModeChip
+        <Choice
+        compact
           active={value.mode === 'groups'}
           onClick={() => setMode('groups')}
           icon={<UsersRound className="w-4 h-4" />}
-          label="Groups"
-          sub="Include / exclude"
+          title="Groups"
+          subtitle="Include / exclude"
         />
       </div>
 
@@ -111,48 +116,6 @@ export function AssignmentPicker({ value, onChange, signedIn }: Props) {
         />
       )}
     </div>
-  );
-}
-
-function ModeChip({
-  active,
-  onClick,
-  icon,
-  label,
-  sub,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-  sub: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        'flex items-start gap-2.5 p-3 rounded-md border text-left transition',
-        active
-          ? 'border-primary/50 bg-primary/8 ring-1 ring-primary/40'
-          : 'border-border/60 hover:bg-card-elevated/60',
-      )}
-    >
-      <div
-        className={cn(
-          'mt-0.5 w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0',
-          active ? 'bg-primary/15 text-primary' : 'bg-card text-muted-foreground',
-        )}
-      >
-        {icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium leading-tight">{label}</div>
-        <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
-          {sub}
-        </div>
-      </div>
-    </button>
   );
 }
 
@@ -228,14 +191,14 @@ function GroupsPicker({
   }
 
   return (
-    <div className="rounded-md border border-border/60 bg-background/30 p-3 space-y-3">
+    <div className="rounded-lg border border-border bg-card-elevated/40 p-3 space-y-3">
       {/* Selected */}
       {value.length > 0 && (
         <div className="space-y-2">
           {value.map((g) => (
             <div
               key={g.id}
-              className="rounded-md bg-card-elevated/40 border border-border/60 overflow-hidden"
+              className="rounded-md bg-card-elevated/40 border border-border overflow-hidden"
             >
               <div className="flex items-center gap-2 px-2.5 py-1.5">
                 <button
@@ -266,7 +229,7 @@ function GroupsPicker({
               </div>
               {/* Per-group filter — only meaningful for includes */}
               {g.intent === 'include' && (
-                <div className="px-2.5 py-1.5 border-t border-border/60 bg-background/30 flex flex-wrap items-center gap-2">
+                <div className="px-2.5 py-1.5 border-t border-border bg-card-elevated/40 flex flex-wrap items-center gap-2">
                   <Filter className="w-3 h-3 text-muted-foreground" />
                   <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
                     Filter
@@ -284,7 +247,7 @@ function GroupsPicker({
                         type: g.filter?.type ?? 'include',
                       });
                     }}
-                    className="text-xs bg-input/60 border border-border/60 rounded px-1.5 py-0.5 focus:outline-none focus:ring-2 focus:ring-ring/60 flex-1 min-w-[140px]"
+                    className="text-xs bg-input border border-border rounded px-1.5 py-0.5 focus:outline-none focus:ring-2 focus:ring-ring/40 flex-1 min-w-[140px]"
                   >
                     <option value="">No filter</option>
                     {filters.map((f) => (
@@ -294,7 +257,7 @@ function GroupsPicker({
                     ))}
                   </select>
                   {g.filter && (
-                    <div className="flex gap-0.5 p-0.5 rounded bg-card-elevated/60 border border-border/60 text-[10px]">
+                    <div className="flex gap-0.5 p-0.5 rounded bg-card-elevated/60 border border-border text-[10px]">
                       <button
                         type="button"
                         onClick={() =>
@@ -340,7 +303,7 @@ function GroupsPicker({
 
       {/* Search */}
       <div className="flex items-center gap-2">
-        <div className="flex gap-1 p-0.5 rounded-md bg-card-elevated/40 border border-border/60 text-[11px]">
+        <div className="flex gap-1 p-0.5 rounded-md bg-card-elevated/40 border border-border text-[11px]">
           <button
             type="button"
             onClick={() => setPendingIntent('include')}
@@ -376,13 +339,13 @@ function GroupsPicker({
               signedIn ? 'Search security groups…' : 'Sign in to search groups'
             }
             disabled={!signedIn}
-            className="w-full pl-8 pr-3 py-1.5 text-sm bg-input/60 border border-border/60 rounded-md focus:outline-none focus:ring-2 focus:ring-ring/60 disabled:opacity-50"
+            className="w-full pl-8 pr-3 py-1.5 text-sm bg-input border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring/40 disabled:opacity-50"
           />
         </div>
       </div>
 
       {signedIn && (
-        <div className="max-h-48 overflow-auto rounded-md border border-border/60 bg-background/40">
+        <div className="max-h-48 overflow-auto rounded-lg border border-border bg-card-elevated/40">
           {loading && (
             <div className="flex items-center justify-center gap-2 p-3 text-xs text-muted-foreground">
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -443,7 +406,7 @@ function FilterPicker({
 }) {
   const empty = !loading && !error && filters.length === 0;
   return (
-    <div className="rounded-md border border-border/60 bg-background/30 p-3">
+    <div className="rounded-lg border border-border bg-card-elevated/40 p-3">
       <div className="flex items-center gap-2 mb-2">
         <Filter className="w-3.5 h-3.5 text-muted-foreground" />
         <div className="section-label">Assignment filter (optional)</div>
@@ -483,7 +446,7 @@ function FilterPicker({
               type: value?.type ?? 'include',
             });
           }}
-          className="text-sm bg-input/60 border border-border/60 rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring/60 min-w-[200px]"
+          className="text-sm bg-input border border-border rounded-md px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring/40 min-w-[200px]"
         >
           <option value="">No filter</option>
           {filters.map((f) => (
@@ -493,7 +456,7 @@ function FilterPicker({
           ))}
         </select>
         {value && (
-          <div className="flex gap-1 p-0.5 rounded-md bg-card-elevated/40 border border-border/60 text-[11px]">
+          <div className="flex gap-1 p-0.5 rounded-md bg-card-elevated/40 border border-border text-[11px]">
             <button
               type="button"
               onClick={() => onChange({ ...value, type: 'include' })}

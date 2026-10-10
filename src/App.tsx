@@ -170,14 +170,14 @@ export default function App() {
       />
 
       <main className="flex-1">
-        <div className="max-w-[1760px] mx-auto px-6 py-6">
+        <div className="max-w-[1760px] mx-auto px-4 sm:px-6 py-7">
           <Stepper
             current={step}
             onChange={(s) => (s === 'deploy' ? goToDeploy() : goToBuild())}
             canDeploy={canDeploy}
           />
 
-          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_560px] gap-6">
+          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_540px] gap-6 xl:gap-8">
             {/* LEFT: workspace — content swaps per step */}
             <div className="min-w-0">
               {step === 'build' ? (
@@ -295,7 +295,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={goToBuild}
-                      className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 -ml-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-card transition"
                     >
                       <ArrowLeft className="w-4 h-4" />
                       Back to Build
@@ -324,7 +324,7 @@ export default function App() {
                 </>
               )}
 
-              <footer className="text-center text-xs text-muted-foreground py-8 mt-2">
+              <footer className="text-center text-xs text-muted-foreground py-8 mt-2 leading-relaxed">
                 <p>
                   This tool processes all data locally in your browser. No
                   information is sent to any server.
@@ -337,7 +337,7 @@ export default function App() {
             </div>
 
             {/* RIGHT: Profile metadata + sticky output rail */}
-            <aside className="xl:sticky xl:top-[4.5rem] xl:self-start space-y-5">
+            <aside className="xl:sticky xl:top-[5.5rem] xl:self-start space-y-5">
               {step === 'build' &&
                 selectedApps.length > 0 &&
                 outputMode === 'bundle' && (
@@ -357,7 +357,7 @@ export default function App() {
         </div>
       </main>
 
-      <footer className="border-t border-border bg-background/60">
+      <footer className="border-t border-border bg-card/50">
         <div className="max-w-[1760px] mx-auto px-6 py-5 text-center text-xs text-muted-foreground">
           MacPPPC is owned and maintained by{' '}
           <a

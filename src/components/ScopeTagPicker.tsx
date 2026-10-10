@@ -76,7 +76,7 @@ export function ScopeTagPicker({ value, onChange, signedIn }: Props) {
         onClick={() => signedIn && setOpen((v) => !v)}
         disabled={!signedIn}
         className={cn(
-          'w-full flex items-center gap-2 text-sm bg-input/60 border border-border/60 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring/60 transition',
+          'w-full flex items-center gap-2 text-sm bg-input border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 transition',
           !signedIn && 'opacity-60 cursor-not-allowed',
           open && 'ring-2 ring-ring/60',
         )}

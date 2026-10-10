@@ -11,7 +11,7 @@ interface Props {
 }
 
 const inputCls =
-  'w-full text-sm bg-input/60 border border-border/60 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60';
+  'w-full text-sm bg-input border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60';
 
 /** macOS 27 Safari website privacy defaults (camera / microphone per website). */
 export function WebsitePrivacyCard({
@@ -31,7 +31,7 @@ export function WebsitePrivacyCard({
           <button
             type="button"
             onClick={onAdd}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-md border border-border/60 hover:bg-card-elevated transition"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-border bg-card text-primary hover:border-primary/40 hover:bg-primary/[0.05] transition shadow-sm"
           >
             <Plus className="w-3.5 h-3.5" />
             Add website
@@ -40,7 +40,7 @@ export function WebsitePrivacyCard({
       />
       <CardBody className="space-y-3">
         {sites.length === 0 && (
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[13px] text-muted-foreground leading-relaxed">
             Optional. Add websites such as <code>teams.microsoft.com</code> or{' '}
             <code>*zoom.us</code> (the <code>*</code> prefix also matches
             sub-domains). Safari shows the user one consent prompt per website.
@@ -49,7 +49,7 @@ export function WebsitePrivacyCard({
         {sites.map((s) => (
           <div
             key={s.id}
-            className="rounded-md border border-border/60 bg-card-elevated/30 p-3 space-y-2"
+            className="rounded-lg border border-border bg-card-elevated/40 p-3.5 space-y-2.5"
           >
             <div className="flex items-center gap-3">
               <input
@@ -60,17 +60,19 @@ export function WebsitePrivacyCard({
                 aria-label="Website"
                 className={`${inputCls} font-mono flex-1`}
               />
-              <label className="inline-flex items-center gap-1.5 text-sm">
+              <label className="inline-flex items-center gap-2 text-sm cursor-pointer select-none">
                 <input
                   type="checkbox"
+                  className="w-4 h-4 accent-primary"
                   checked={s.camera}
                   onChange={(e) => onChange(s.id, { ...s, camera: e.target.checked })}
                 />
                 Camera
               </label>
-              <label className="inline-flex items-center gap-1.5 text-sm">
+              <label className="inline-flex items-center gap-2 text-sm cursor-pointer select-none">
                 <input
                   type="checkbox"
+                  className="w-4 h-4 accent-primary"
                   checked={s.microphone}
                   onChange={(e) => onChange(s.id, { ...s, microphone: e.target.checked })}
                 />
@@ -79,7 +81,7 @@ export function WebsitePrivacyCard({
               <button
                 type="button"
                 onClick={() => onRemove(s.id)}
-                className="p-1.5 text-muted-foreground hover:text-destructive transition"
+                className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition"
                 aria-label="Remove website"
               >
                 <Trash2 className="w-4 h-4" />

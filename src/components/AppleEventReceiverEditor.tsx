@@ -74,7 +74,7 @@ export function AppleEventReceiverEditor({ receivers, knownApps, onChange }: Pro
       {receivers.map((r, idx) => (
         <div
           key={idx}
-          className="rounded-md border border-border/60 bg-background/30 p-2.5 space-y-2"
+          className="rounded-lg border border-border bg-card-elevated/40 p-2.5 space-y-2"
         >
           <div className="flex items-center gap-2">
             <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium w-24 shrink-0">
@@ -87,7 +87,7 @@ export function AppleEventReceiverEditor({ receivers, knownApps, onChange }: Pro
                   identifierType: e.target.value as 'bundleID' | 'path',
                 })
               }
-              className="text-[11px] bg-input/60 border border-border/60 rounded px-1.5 py-1"
+              className="text-[11px] bg-input border border-border rounded px-1.5 py-1"
             >
               <option value="bundleID">bundleID</option>
               <option value="path">path</option>
@@ -97,7 +97,7 @@ export function AppleEventReceiverEditor({ receivers, knownApps, onChange }: Pro
               onChange={(e) =>
                 update(idx, { authorization: e.target.value as Authorization })
               }
-              className="text-[11px] bg-input/60 border border-border/60 rounded px-1.5 py-1 ml-auto"
+              className="text-[11px] bg-input border border-border rounded px-1.5 py-1 ml-auto"
             >
               <option value="Allow">Allow</option>
               <option value="AllowStandardUserToSetSystemService">
@@ -125,7 +125,7 @@ export function AppleEventReceiverEditor({ receivers, knownApps, onChange }: Pro
                   ? 'com.apple.finder'
                   : '/System/Applications/Finder.app'
               }
-              className="flex-1 text-[12px] font-mono bg-input/60 border border-border/60 rounded px-2 py-1.5"
+              className="flex-1 text-[12px] font-mono bg-input border border-border rounded px-2 py-1.5"
             />
             {knownApps.length > 0 && (
               <div className="relative">
@@ -134,14 +134,14 @@ export function AppleEventReceiverEditor({ receivers, knownApps, onChange }: Pro
                   onClick={() =>
                     setPickerOpenFor(pickerOpenFor === idx ? null : idx)
                   }
-                  className="px-2 py-1.5 rounded border border-border/60 hover:bg-card-elevated text-muted-foreground hover:text-foreground transition"
+                  className="px-2 py-1.5 rounded border border-border hover:bg-card-elevated text-muted-foreground hover:text-foreground transition"
                   title="Pick from known apps"
                   aria-label="Pick from known apps"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                 </button>
                 {pickerOpenFor === idx && (
-                  <div className="absolute right-0 top-full mt-1 z-20 w-72 max-h-64 overflow-auto rounded-md border border-border bg-card shadow-lg">
+                  <div className="absolute right-0 top-full mt-1 z-20 w-72 max-h-64 overflow-auto rounded-md border border-border bg-card shadow-[var(--shadow-lift)]">
                     {knownApps.map((app) => (
                       <button
                         key={app.bundleId}
@@ -172,7 +172,7 @@ export function AppleEventReceiverEditor({ receivers, knownApps, onChange }: Pro
                 ? `identifier "${r.identifier}" and anchor apple generic`
                 : 'Designated code requirement for the receiver app'
             }
-            className="w-full text-[11px] font-mono bg-input/60 border border-border/60 rounded px-2 py-1.5 resize-y"
+            className="w-full text-[11px] font-mono bg-input border border-border rounded px-2 py-1.5 resize-y"
           />
         </div>
       ))}
