@@ -1,56 +1,45 @@
-# Pre-built plist library
+# Known apps library
 
-Drop curated `Info.plist` files or full `.mobileconfig` profiles here. Files
-in this folder are served at `/library/...` on the deployed site (via Vite's
-`public/` convention), so the app can fetch them at runtime.
+`known-apps.json` is the list behind *Select a known application…*. It is
+loaded at runtime from `/library/known-apps.json`, so changes ship without
+a rebuild.
 
-## Layout convention
-
-Organise files by Apple bundle identifier (one folder per app), and add a
-`manifest.json` at the root of this folder if you want the app to enumerate
-them.
-
-```
-public/library/
-  manifest.json                          # index of all entries (optional)
-  com.microsoft.teams/
-    Info.plist                           # sample bundle plist for Teams
-  com.microsoft.edgemac/
-    Info.plist
-  com.google.Chrome/
-    Info.plist
-```
-
-## Sample `manifest.json`
+Each entry maps a bundle ID to its **designated code requirement**:
 
 ```json
 {
-  "manifestVersion": "1.0",
-  "entries": [
+  "apps": [
     {
-      "id": "teams-info",
-      "displayName": "Microsoft Teams",
-      "bundleId": "com.microsoft.teams",
-      "file": "com.microsoft.teams/Info.plist",
-      "description": "Bundled Info.plist for Microsoft Teams"
+      "bundleId": "com.microsoft.teams2",
+      "displayName": "Microsoft Teams (new)",
+      "codeRequirement": "identifier \"com.microsoft.teams2\" and anchor apple generic and …"
     }
   ]
 }
 ```
 
-## What goes here
+## Adding an app
 
-- **Sanitized** `Info.plist` files — no Apple Developer team IDs scrubbed,
-  no per-environment paths.
-- **Pre-built `.mobileconfig`** templates that downstream users can import
-  and tweak.
+Get the code requirement from an installed copy of the app:
+
+```bash
+codesign --display -r - /Applications/YourApp.app
+```
+
+Or harvest every app in `/Applications` at once — the script emits one JSON
+entry per app in the shape above:
+
+```bash
+./scripts/harvest-known-apps.sh                # scans /Applications
+./scripts/harvest-known-apps.sh /path/to/Apps  # scan a different folder
+```
+
+Merge new entries into the `apps` array by hand and keep the list sorted
+by `displayName`. Not comfortable with a pull request? Open an issue with
+the **Add a known app** template instead.
 
 ## What does NOT belong here
 
-- Real customer profile UUIDs, organization names, or PayloadIdentifier
-  values tied to a specific tenant.
-- Any file containing plaintext passwords, SCEP challenge strings, or PKCS#12
-  blobs with private keys.
-
-> Wiring the app UI to actually browse and fetch these files is a separate
-> feature — see the roadmap discussion in the project notes.
+- Requirements copied from an unsigned or re-signed build — they will not
+  match the real app.
+- Anything tenant-specific (organization names, payload UUIDs).

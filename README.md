@@ -1,9 +1,10 @@
 # MacPPPC
 
 **[macpppc.com](https://macpppc.com)** — a browser-based builder for macOS
-**Privacy Preferences Policy Control (PPPC)** profiles that deploys them
-straight to **Microsoft Intune**. No Jamf, no hand-written XML, no
-per-admin downloads, no backend.
+**Privacy Preferences Policy Control (PPPC)** profiles — and, for macOS 27,
+the **declarative (DDM) App Privacy and Safari Privacy** settings that
+replace part of PPPC — that deploys them straight to **Microsoft Intune**.
+No Jamf, no hand-written XML, no per-admin downloads, no backend.
 
 MacPPPC is a 100% client-side React app served from GitHub Pages. Profiles
 are generated in your browser. Intune deployment happens directly between
@@ -31,6 +32,9 @@ is proxied through a server we control, because there is no server.
 - **Auto-fills designated code requirements** for a curated list of known
   apps. Need something unlisted? Drop in an `Info.plist`, or upload a
   zipped `.app` bundle and MacPPPC will extract the bundle identifier.
+- **Targets macOS 26 or macOS 27.** On macOS 27 the PPPC services Apple
+  deprecated move to DDM App Privacy, and you can add Safari website
+  privacy defaults — see [macOS 27](#macos-27-pppc--ddm) below.
 - **Enforces Apple's MDM rules** automatically. Camera and Microphone are
   restricted to *Deny* (Apple ignores everything else for these). Screen
   Recording and Input Monitoring are restricted to *Deny* or *Allow
@@ -49,13 +53,37 @@ Both formats produce **identical macOS behavior** — they deploy the same
 24 services. The choice is purely about how the policy looks and edits in
 the Intune portal.
 
+### macOS 27: PPPC + DDM
+
+Pick **macOS 27** in the *Target macOS* switch to build for macOS 27.
+
+- **App Privacy** (`com.apple.configuration.app.settings` →
+  `Privacy.PermissionDefaults`) replaces the PPPC services Apple deprecated
+  in 27.0: Accessibility, Camera, Microphone, Speech Recognition (now
+  *Dictation*) and Bluetooth. It also adds **Local Network** and
+  **Location**, which have no PPPC equivalent. Each app gets an
+  organization justification that is shown in the consent prompt.
+- **Safari website privacy** (`com.apple.configuration.safari.settings`)
+  suggests camera / microphone access per website. `example.com` matches
+  that site only; `*example.com` also matches its sub-domains.
+- Services that are still PPPC-only (Full Disk Access, Screen Recording,
+  Input Monitoring, …) stay in the PPPC profile, so one app can use both.
+- **Switching the target converts** existing permissions and reports what
+  moved and what was dropped (DDM has no *Deny*; PPPC cannot *Allow*
+  Camera / Microphone). *Undo* restores the previous state.
+
+DDM privacy defaults are **suggestions**: on first launch the user sees
+one consent prompt and can choose *Not Now*. They always deploy as
+Settings Catalog policies — there is no `.mobileconfig` form.
+
 ### Bundled or separate
 
 - **Single bundle** — every app in one policy. Easy to deploy, easy to
   scope.
 - **Separate profiles** — one policy per app. Downloaded as a ZIP if you
   prefer manual upload, or deployed as N separate Intune policies if you
-  want per-app assignments.
+  want per-app assignments. On macOS 27 each app also gets its own App
+  Privacy policy; Safari Privacy stays one shared policy.
 
 ---
 
@@ -65,16 +93,20 @@ The whole app is one page in two steps.
 
 ### Step 1 — Build profiles
 
-1. **Add apps.** Drag-and-drop a `.zip` of an `.app` bundle, drop an
+1. **Pick the target** — *macOS 26 and earlier* (PPPC only) or
+   *macOS 27* (PPPC + DDM App Privacy & Safari Privacy).
+2. **Add apps.** Drag-and-drop a `.zip` of an `.app` bundle, drop an
    `Info.plist` directly, or pick from the built-in known-apps list.
-2. **Toggle permissions** per app. The authorization dropdown
+3. **Toggle permissions** per app. The authorization dropdown
    (Allow / Allow standard user / Deny) is constrained by Apple's rules
-   per service.
-3. **Pick output mode** — *Single bundle* (default) or *Separate
+   per service. On macOS 27, the *App Privacy* section per app and the
+   *Safari website privacy* card appear as well.
+4. **Pick output mode** — *Single bundle* (default) or *Separate
    profiles*.
-4. **Pick deployment format** — *Templates › Custom* or *Settings
-   Catalog*.
-5. The right rail shows a **live preview** (XML for Custom, JSON for
+5. **Pick deployment format** — *Templates › Custom* or *Settings
+   Catalog*. This applies to the PPPC profile; DDM policies are always
+   Settings Catalog.
+6. The right rail shows a **live preview** (XML for Custom, JSON for
    Settings Catalog) with syntax highlighting and optional word-wrap.
    Multiple profiles appear as collapsible accordions, collapsed by
    default so the Deploy step is one scroll away.
@@ -135,7 +167,12 @@ All four require admin consent at first use in your tenant.
 
 ## Caveats
 
-- Some macOS permissions cannot be force-granted from MDM (Apple
+- **macOS 27 DDM privacy** (App Privacy, Safari Privacy) requires a
+  **supervised** Mac (Automated Device Enrollment) and applies in **user
+  scope** only, so it reaches Macs enrolled with user affinity — prefer
+  user groups when assigning. App Privacy only works for AppKit apps, and
+  the consent prompt only lists permissions the user hasn't seen before.
+- Some PPPC permissions cannot be force-granted from MDM (Apple
   limitation): Camera and Microphone honour only *Deny*; Screen Recording
   and Input Monitoring honour *Deny* or *Allow standard user to enable*.
   Every other service gets the full dropdown.
