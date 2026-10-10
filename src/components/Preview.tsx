@@ -13,20 +13,17 @@ import {
   WrapText,
   AlignLeft,
 } from 'lucide-react';
-import { PPPC_PERMISSIONS } from '@/lib/permissions';
-import type { GeneratedProfile, OutputMode, SelectedApp } from '@/lib/types';
+import type { GeneratedProfile } from '@/lib/types';
 import { cn } from '@/lib/cn';
 import { XmlHighlight } from './XmlHighlight';
 
 interface Props {
   profiles: GeneratedProfile[];
-  selectedApps: SelectedApp[];
-  mode: OutputMode;
   onDeploy?: () => void;
   deployEnabled?: boolean;
 }
 
-export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled }: Props) {
+export function Preview({ profiles, onDeploy, deployEnabled }: Props) {
   const [copied, setCopied] = useState<string | null>(null);
   const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
   const [wrap, setWrap] = useState(false);
@@ -35,6 +32,8 @@ export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled 
   const totalBytes = profiles.reduce((s, p) => s + p.content.length, 0);
   const format = profiles[0]?.format ?? 'classic';
   const isJson = format === 'settingsCatalog';
+  // macOS 27 can emit PPPC + DDM policies even in bundle mode.
+  const multi = profiles.length > 1;
 
   function showCopied(key: string) {
     setCopied(key);
@@ -69,9 +68,10 @@ export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled 
 
   async function download() {
     if (!hasProfiles) return;
-    const mime = isJson ? 'application/json' : 'application/x-apple-aspen-config';
-    if (mode === 'bundle' || profiles.length === 1) {
+    if (!multi) {
       const p = profiles[0];
+      const mime =
+        p.format === 'settingsCatalog' ? 'application/json' : 'application/x-apple-aspen-config';
       triggerDownload(new Blob([p.content], { type: mime }), p.filename);
       return;
     }
@@ -93,37 +93,15 @@ export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled 
     URL.revokeObjectURL(url);
   }
 
-  // Permissions enabled per app, by bundleId
-  function permsForBundle(bundleId: string | undefined) {
-    const apps = bundleId
-      ? selectedApps.filter((a) => a.app.bundleId === bundleId)
-      : selectedApps;
-    return apps.flatMap((item) =>
-      Object.entries(item.permissions)
-        .filter(([, s]) => s.enabled)
-        .map(([permId]) => {
-          const perm = PPPC_PERMISSIONS.find((p) => p.id === permId);
-          return {
-            key: `${item.id}-${permId}`,
-            label:
-              bundleId
-                ? perm?.name ?? permId
-                : `${item.app.displayName} · ${perm?.name ?? permId}`,
-          };
-        }),
-    );
-  }
-
   const fallbackFilename = isJson ? 'policy.json' : 'profile.mobileconfig';
   const headerFilename = hasProfiles
-    ? mode === 'separate' && profiles.length > 1
-      ? `${profiles.length} ${isJson ? 'policies' : 'profiles'}`
+    ? multi
+      ? `${profiles.length} policies`
       : profiles[0]?.filename ?? fallbackFilename
     : fallbackFilename;
 
-  const copyLabel = isJson ? 'Copy JSON' : 'Copy XML';
   const downloadLabel =
-    mode === 'separate' && profiles.length > 1
+    multi
       ? `Download .zip (${profiles.length})`
       : 'Download';
 
@@ -140,7 +118,7 @@ export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled 
                 <CheckCircle2 className="w-3 h-3 text-primary" />
                 <span>
                   Valid · {totalBytes.toLocaleString()} bytes
-                  {mode === 'separate' && profiles.length > 1
+                  {multi
                     ? ` · ${profiles.length} files`
                     : ''}
                 </span>
@@ -189,7 +167,7 @@ export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled 
             {profiles.map((p) => {
               const key = p.bundleId ?? p.filename;
               const open = !!openMap[key];
-              const permTags = permsForBundle(p.bundleId);
+              const permTags = p.labels;
               return (
                 <div key={key}>
                   <button
@@ -221,10 +199,10 @@ export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled 
                           <div className="flex flex-wrap gap-1.5">
                             {permTags.map((t) => (
                               <span
-                                key={t.key}
+                                key={t}
                                 className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary/10 text-primary text-[11px] font-medium"
                               >
-                                {t.label}
+                                {t}
                               </span>
                             ))}
                           </div>
@@ -244,7 +222,7 @@ export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled 
                           ) : (
                             <>
                               <Copy className="w-3 h-3" />
-                              {copyLabel}
+                              {p.format === 'settingsCatalog' ? 'Copy JSON' : 'Copy XML'}
                             </>
                           )}
                         </button>
@@ -274,7 +252,7 @@ export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled 
 
       {/* Actions */}
       <div className="grid grid-cols-2 gap-2 p-3 border-t border-border/60 bg-card-elevated/40">
-        {mode === 'bundle' && (
+        {!multi && (
           <button
             type="button"
             onClick={() => hasProfiles && copyContent(profiles[0], 'bundle')}
@@ -297,9 +275,9 @@ export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled 
             )}
           </button>
         )}
-        {mode === 'separate' && (
+        {multi && (
           <div className="text-[11px] text-muted-foreground self-center px-2">
-            Use {copyLabel} inside each profile, or Download for all.
+            Use Copy inside each policy, or Download for all.
           </div>
         )}
         <button
@@ -327,7 +305,7 @@ export function Preview({ profiles, selectedApps, mode, onDeploy, deployEnabled 
           title={deployEnabled ? 'Continue to deploy' : 'Generate profiles first'}
         >
           <UploadIcon className="w-4 h-4" />
-          {mode === 'separate' && profiles.length > 1
+          {multi
             ? `Deploy ${profiles.length} policies to Intune`
             : 'Deploy to Intune'}
         </button>

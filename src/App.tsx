@@ -12,6 +12,10 @@ import { DeploymentPanel } from './components/DeploymentPanel';
 import { PolicyList } from './components/PolicyList';
 import { Stepper, type Step } from './components/Stepper';
 import { Toast } from './components/Toast';
+import { MacOSTargetToggle } from './components/MacOSTargetToggle';
+import { WebsitePrivacyCard } from './components/WebsitePrivacyCard';
+import { convertApps, type ConversionReport } from './lib/osTarget';
+import { defaultAppJustification, defaultWebsiteJustification } from './lib/ddmPrivacy';
 import { generateProfiles } from './lib/profiles';
 import { generateRandomUUID } from './lib/uuid';
 import { useAuth } from './lib/auth/useAuth';
@@ -21,10 +25,12 @@ import type {
   AppInfo,
   DeploymentFormat,
   KnownApp,
+  MacOSTarget,
   OutputMode,
   PermissionState,
   ProfileSettings as ProfileSettingsType,
   SelectedApp,
+  WebsitePrivacy,
 } from './lib/types';
 
 export default function App() {
@@ -34,6 +40,12 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [outputMode, setOutputMode] = useState<OutputMode>('bundle');
   const [format, setFormat] = useState<DeploymentFormat>('classic');
+  const [target, setTarget] = useState<MacOSTarget>('26');
+  const [report, setReport] = useState<ConversionReport | null>(null);
+  // Snapshot from before the last target switch; cleared on any later edit
+  // so Undo never throws away work done after the switch.
+  const [undo, setUndo] = useState<{ apps: SelectedApp[]; target: MacOSTarget } | null>(null);
+  const [websites, setWebsites] = useState<WebsitePrivacy[]>([]);
   const [knownApps, setKnownApps] = useState<KnownApp[]>([]);
   const { state: auth, signIn, signOut } = useAuth();
 
@@ -80,6 +92,7 @@ export default function App() {
     payloadDescription: '',
     scopeTagIds: ['0'],
     deploymentChannel: 'deviceChannel',
+    privacyJustification: '',
   }));
 
   const innerUUID = useMemo(() => generateRandomUUID(), []);
@@ -97,15 +110,35 @@ export default function App() {
     ]);
     setNextId((id) => id + 1);
     setError(null);
+    setUndo(null);
   }
 
   function updateApp(id: number, mutate: (a: SelectedApp) => SelectedApp) {
     setSelectedApps((prev) => prev.map((a) => (a.id === id ? mutate(a) : a)));
+    setUndo(null);
+  }
+
+  function switchTarget(next: MacOSTarget) {
+    if (next === target) return;
+    const converted = convertApps(selectedApps, next);
+    setUndo({ apps: selectedApps, target });
+    setSelectedApps(converted.apps);
+    setTarget(next);
+    setReport(selectedApps.length > 0 ? converted.report : null);
+  }
+
+  function undoSwitch() {
+    if (!undo) return;
+    setSelectedApps(undo.apps);
+    setTarget(undo.target);
+    setUndo(null);
+    setReport(null);
   }
 
   const profiles = useMemo(
-    () => generateProfiles(selectedApps, settings, outputMode, format, innerUUID),
-    [selectedApps, settings, outputMode, format, innerUUID],
+    () =>
+      generateProfiles(selectedApps, settings, outputMode, format, innerUUID, target, websites),
+    [selectedApps, settings, outputMode, format, innerUUID, target, websites],
   );
 
   const enabledCount = totalEnabledPermissions(selectedApps);
@@ -149,6 +182,14 @@ export default function App() {
             <div className="min-w-0">
               {step === 'build' ? (
                 <>
+                  <MacOSTargetToggle
+                    value={target}
+                    onChange={switchTarget}
+                    report={report}
+                    canUndo={!!undo}
+                    onUndo={undoSwitch}
+                    onDismissReport={() => setReport(null)}
+                  />
                   <AppInput
                     knownApps={knownApps}
                     onAppDetected={handleAppDetected}
@@ -177,6 +218,17 @@ export default function App() {
                             key={item.id}
                             item={item}
                             mode={outputMode}
+                            target={target}
+                            justificationPlaceholder={defaultAppJustification(
+                              settings,
+                              item.app.displayName,
+                            )}
+                            onChangeJustification={(next) =>
+                              updateApp(item.id, (a) => ({
+                                ...a,
+                                privacyJustification: next,
+                              }))
+                            }
                             knownApps={knownApps}
                             onToggleExpanded={() =>
                               updateApp(item.id, (a) => ({
@@ -184,11 +236,12 @@ export default function App() {
                                 expanded: !a.expanded,
                               }))
                             }
-                            onRemove={() =>
+                            onRemove={() => {
                               setSelectedApps((prev) =>
                                 prev.filter((a) => a.id !== item.id),
-                              )
-                            }
+                              );
+                              setUndo(null);
+                            }}
                             onChangePermission={(permId, next: PermissionState) =>
                               updateApp(item.id, (a) => ({
                                 ...a,
@@ -210,6 +263,31 @@ export default function App() {
                     </Card>
                   )}
 
+                  {target === '27' && (
+                    <WebsitePrivacyCard
+                      sites={websites}
+                      defaultJustification={defaultWebsiteJustification(settings)}
+                      onAdd={() => {
+                        setWebsites((prev) => [
+                          ...prev,
+                          {
+                            id: nextId,
+                            domain: '',
+                            camera: true,
+                            microphone: true,
+                            justification: '',
+                          },
+                        ]);
+                        setNextId((id) => id + 1);
+                      }}
+                      onChange={(id, next) =>
+                        setWebsites((prev) => prev.map((s) => (s.id === id ? next : s)))
+                      }
+                      onRemove={(id) =>
+                        setWebsites((prev) => prev.filter((s) => s.id !== id))
+                      }
+                    />
+                  )}
                 </>
               ) : (
                 <>
@@ -263,12 +341,14 @@ export default function App() {
               {step === 'build' &&
                 selectedApps.length > 0 &&
                 outputMode === 'bundle' && (
-                  <ProfileSettings value={settings} onChange={setSettings} />
+                  <ProfileSettings
+                    value={settings}
+                    onChange={setSettings}
+                    showPrivacyJustification={target === '27'}
+                  />
                 )}
               <Preview
                 profiles={profiles}
-                selectedApps={selectedApps}
-                mode={outputMode}
                 deployEnabled={canDeploy && step === 'build'}
                 onDeploy={goToDeploy}
               />

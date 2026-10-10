@@ -3,14 +3,24 @@ import {
   buildSettingsCatalogPolicy,
   serializeSettingsCatalogPolicy,
 } from './settingsCatalog';
+import {
+  activeWebsites,
+  appPrivacyApps,
+  buildAppPrivacyPolicy,
+  buildSafariPrivacyPolicy,
+} from './ddmPrivacy';
+import { pppcPermissionsFor } from './osTarget';
+import { APP_PRIVACY_PERMISSIONS } from './permissions';
 import { generateRandomUUID } from './uuid';
 import { safeFilename, totalEnabledPermissions } from './state';
 import type {
   DeploymentFormat,
   GeneratedProfile,
+  MacOSTarget,
   OutputMode,
   ProfileSettings,
   SelectedApp,
+  WebsitePrivacy,
 } from './types';
 
 /**
@@ -35,8 +45,90 @@ function buildContent(
     : null;
 }
 
+/** Keep only the permission states that are PPPC on this target. */
+function pppcOnly(apps: SelectedApp[], target: MacOSTarget): SelectedApp[] {
+  const ids = new Set(pppcPermissionsFor(target).map((p) => p.id));
+  return apps.map((a) => ({
+    ...a,
+    permissions: Object.fromEntries(
+      Object.entries(a.permissions).filter(([id]) => ids.has(id)),
+    ),
+  }));
+}
+
+function pppcLabels(apps: SelectedApp[], target: MacOSTarget, withAppName: boolean): string[] {
+  const perms = pppcPermissionsFor(target);
+  return apps.flatMap((a) =>
+    perms
+      .filter((p) => a.permissions[p.id]?.enabled)
+      .map((p) => (withAppName ? `${a.app.displayName} · ${p.name}` : p.name)),
+  );
+}
+
 /**
- * Generate one or more deployment profiles depending on output mode and format.
+ * Generate every deployment profile for the current build.
+ *
+ * macOS 26: PPPC only (see generatePppcProfiles).
+ * macOS 27: PPPC for the services that are still PPPC, plus up to two DDM
+ *           Settings Catalog policies — App Privacy (apps) and Safari Privacy
+ *           (websites). The DDM policies are always one bundle each.
+ */
+export function generateProfiles(
+  apps: SelectedApp[],
+  shared: ProfileSettings,
+  mode: OutputMode,
+  format: DeploymentFormat,
+  innerUUID: string | undefined,
+  target: MacOSTarget,
+  websites: WebsitePrivacy[],
+): GeneratedProfile[] {
+  const out = generatePppcProfiles(pppcOnly(apps, target), shared, mode, format, target, innerUUID);
+  if (target === '26') return out;
+
+  // ponytail: DDM policies are always bundled, even in 'separate' mode. Split per app if asked.
+  const base = shared.payloadName || 'macOS 27';
+  const ddm = [
+    {
+      kind: 'appPrivacy' as const,
+      name: `${base} - App Privacy`,
+      policy: buildAppPrivacyPolicy(apps, { ...shared, payloadName: `${base} - App Privacy` }),
+      labels: appPrivacyApps(apps).flatMap((a) =>
+        APP_PRIVACY_PERMISSIONS.filter((p) => a.permissions[p.id]?.enabled).map(
+          (p) => `${a.app.displayName} · ${p.name}`,
+        ),
+      ),
+    },
+    {
+      kind: 'safariPrivacy' as const,
+      name: `${base} - Safari Privacy`,
+      policy: buildSafariPrivacyPolicy(websites, { ...shared, payloadName: `${base} - Safari Privacy` }),
+      labels: activeWebsites(websites).map(
+        (s) =>
+          `${s.domain.trim()} · ${[s.camera && 'Camera', s.microphone && 'Microphone']
+            .filter(Boolean)
+            .join(' + ')}`,
+      ),
+    },
+  ];
+  for (const d of ddm) {
+    if (!d.policy) continue;
+    out.push({
+      filename: `${safeFilename(d.name)}.json`,
+      policyName: d.name,
+      description: shared.payloadDescription,
+      content: serializeSettingsCatalogPolicy(d.policy),
+      format: 'settingsCatalog',
+      scopeTagIds: shared.scopeTagIds.length > 0 ? shared.scopeTagIds : ['0'],
+      deploymentChannel: shared.deploymentChannel,
+      kind: d.kind,
+      labels: d.labels,
+    });
+  }
+  return out;
+}
+
+/**
+ * Generate one or more PPPC profiles depending on output mode and format.
  *
  * Output mode controls how many profiles are produced:
  *   - 'bundle'   : single profile containing all enabled apps
@@ -46,11 +138,12 @@ function buildContent(
  *   - 'classic'         : `.mobileconfig` plist for macOSCustomConfiguration
  *   - 'settingsCatalog' : JSON for the configurationPolicies Settings Catalog API
  */
-export function generateProfiles(
+function generatePppcProfiles(
   apps: SelectedApp[],
   shared: ProfileSettings,
   mode: OutputMode,
   format: DeploymentFormat,
+  target: MacOSTarget,
   innerUUID?: string,
 ): GeneratedProfile[] {
   if (totalEnabledPermissions(apps) === 0) return [];
@@ -72,6 +165,8 @@ export function generateProfiles(
         format,
         scopeTagIds: shared.scopeTagIds.length > 0 ? shared.scopeTagIds : ['0'],
         deploymentChannel: shared.deploymentChannel,
+        kind: 'pppc',
+        labels: pppcLabels(apps, target, true),
       },
     ];
   }
@@ -89,6 +184,7 @@ export function generateProfiles(
       payloadDescription: app.profile.description || shared.payloadDescription,
       scopeTagIds: app.scopeTagIds,
       deploymentChannel: app.deploymentChannel,
+      privacyJustification: shared.privacyJustification,
     };
     const built = buildContent(
       [app],
@@ -106,6 +202,8 @@ export function generateProfiles(
       bundleId: app.app.bundleId,
       scopeTagIds: app.scopeTagIds.length > 0 ? app.scopeTagIds : ['0'],
       deploymentChannel: app.deploymentChannel,
+      kind: 'pppc',
+      labels: pppcLabels([app], target, false),
     });
   }
   return out;

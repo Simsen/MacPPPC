@@ -7,12 +7,14 @@ interface Props {
   value: ProfileSettingsType;
   onChange: (next: ProfileSettingsType) => void;
   contextLabel?: string;
+  /** macOS 27: show the default App Privacy / Safari justification field. */
+  showPrivacyJustification?: boolean;
 }
 
 const inputCls =
   'w-full bg-input/60 border border-border/60 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60 transition';
 
-export function ProfileSettings({ value, onChange, contextLabel }: Props) {
+export function ProfileSettings({ value, onChange, contextLabel, showPrivacyJustification }: Props) {
   function update<K extends keyof ProfileSettingsType>(
     key: K,
     next: ProfileSettingsType[K],
@@ -77,6 +79,22 @@ export function ProfileSettings({ value, onChange, contextLabel }: Props) {
               className={inputCls}
             />
           </Field>
+          {showPrivacyJustification && (
+            <div className="md:col-span-2">
+              <Field label="Privacy justification (macOS 27)" optional>
+                <input
+                  type="text"
+                  value={value.privacyJustification}
+                  onChange={(e) => update('privacyJustification', e.target.value)}
+                  placeholder={`${value.organization.trim() || 'Your organization'} requires these permissions for <app>.`}
+                  className={inputCls}
+                />
+              </Field>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Shown in the consent prompt for every app and website that has no text of its own.
+              </p>
+            </div>
+          )}
         </div>
       </CardBody>
     </Card>

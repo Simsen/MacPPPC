@@ -1,13 +1,25 @@
-import { ChevronDown, ChevronRight, Trash2, ShieldCheck, AppWindow, RefreshCw } from 'lucide-react';
-import { PPPC_PERMISSIONS, PERMISSION_CATEGORIES } from '@/lib/permissions';
+import { useState } from 'react';
+import { ChevronDown, ChevronRight, Trash2, ShieldCheck, AppWindow, RefreshCw, Info } from 'lucide-react';
+import { APP_PRIVACY_PERMISSIONS, PERMISSION_CATEGORIES } from '@/lib/permissions';
+import { pppcPermissionsFor } from '@/lib/osTarget';
 import { generateRandomUUID } from '@/lib/uuid';
-import type { KnownApp, OutputMode, PermissionState, SelectedApp } from '@/lib/types';
+import type {
+  AppPrivacyPermission,
+  KnownApp,
+  MacOSTarget,
+  OutputMode,
+  PermissionState,
+  SelectedApp,
+} from '@/lib/types';
 import { PermissionRow } from './PermissionRow';
 import { cn } from '@/lib/cn';
 
 interface Props {
   item: SelectedApp;
   mode: OutputMode;
+  target: MacOSTarget;
+  /** Placeholder for the App Privacy justification (the text used when left empty). */
+  justificationPlaceholder: string;
   /** Forwarded to PermissionRow → AppleEventReceiverEditor for the picker. */
   knownApps: KnownApp[];
   onToggleExpanded: () => void;
@@ -15,20 +27,28 @@ interface Props {
   onChangePermission: (permId: string, next: PermissionState) => void;
   onChangeCodeRequirement: (next: string) => void;
   onChangeProfile: (next: SelectedApp['profile']) => void;
+  onChangeJustification: (next: string) => void;
 }
 
 export function AppCard({
   item,
   mode,
+  target,
+  justificationPlaceholder,
   knownApps,
   onToggleExpanded,
   onRemove,
   onChangePermission,
   onChangeCodeRequirement,
   onChangeProfile,
+  onChangeJustification,
 }: Props) {
-  const enabledCount = Object.values(item.permissions).filter((p) => p.enabled)
-    .length;
+  const pppcPerms = pppcPermissionsFor(target);
+  const visibleIds = [
+    ...pppcPerms.map((p) => p.id),
+    ...(target === '27' ? APP_PRIVACY_PERMISSIONS.map((p) => p.id) : []),
+  ];
+  const enabledCount = visibleIds.filter((id) => item.permissions[id]?.enabled).length;
 
   return (
     <div className="rounded-lg border border-border/60 bg-card-elevated/30 overflow-hidden transition hover:border-border-strong/50">
@@ -64,7 +84,7 @@ export function AppCard({
             </div>
           </div>
           <span className="text-xs text-muted-foreground whitespace-nowrap tabular-nums">
-            {enabledCount} / {PPPC_PERMISSIONS.length}
+            {enabledCount} / {visibleIds.length}
           </span>
         </button>
         <button
@@ -186,7 +206,7 @@ export function AppCard({
         </div>
         <div className="p-2 space-y-1">
           {PERMISSION_CATEGORIES.map((cat) => {
-            const perms = PPPC_PERMISSIONS.filter((p) => p.category === cat.id);
+            const perms = pppcPerms.filter((p) => p.category === cat.id);
             if (perms.length === 0) return null;
             return (
               <div key={cat.id}>
@@ -211,7 +231,108 @@ export function AppCard({
             );
           })}
         </div>
+        {target === '27' && (
+          <div className="border-t border-border/60 p-2">
+            <div className="px-3 pt-3 pb-1 flex items-center gap-2">
+              <span className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+                App Privacy
+              </span>
+              <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                DDM · macOS 27
+              </span>
+            </div>
+            <p className="px-3 text-[11px] text-muted-foreground">
+              Enabled permissions are suggested as Allow in one consent prompt.
+              The user can decline. Deployed as a separate Settings Catalog policy.
+            </p>
+            {APP_PRIVACY_PERMISSIONS.map((perm) => (
+              <AppPrivacyRow
+                key={perm.id}
+                perm={perm}
+                enabled={!!item.permissions[perm.id]?.enabled}
+                onToggle={() =>
+                  onChangePermission(perm.id, {
+                    enabled: !item.permissions[perm.id]?.enabled,
+                    authorization: 'Allow',
+                  })
+                }
+              />
+            ))}
+            <div className="px-3 pt-2 pb-3">
+              <label className="block text-[11px] font-medium text-muted-foreground mb-1">
+                Justification shown to the user
+              </label>
+              <input
+                type="text"
+                value={item.privacyJustification}
+                onChange={(e) => onChangeJustification(e.target.value)}
+                placeholder={justificationPlaceholder}
+                className="w-full text-sm bg-input/60 border border-border/60 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60"
+              />
+            </div>
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+function AppPrivacyRow({
+  perm,
+  enabled,
+  onToggle,
+}: {
+  perm: AppPrivacyPermission;
+  enabled: boolean;
+  onToggle: () => void;
+}) {
+  const [showTip, setShowTip] = useState(false);
+  return (
+    <div className="p-3 rounded-md hover:bg-background/30 transition">
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={onToggle}
+          role="switch"
+          aria-checked={enabled}
+          className={cn(
+            'relative inline-flex h-5 w-9 items-center rounded-full transition',
+            enabled ? 'bg-primary' : 'bg-muted',
+          )}
+        >
+          <span
+            className={cn(
+              'inline-block h-4 w-4 transform rounded-full bg-white transition',
+              enabled ? 'translate-x-4' : 'translate-x-0.5',
+            )}
+          />
+        </button>
+        <span className="font-medium">{perm.name}</span>
+        {enabled && (
+          <span className="text-[10px] font-mono text-muted-foreground/70 px-1 py-0.5 rounded bg-muted/30">
+            {perm.id === 'location' ? 'Always' : 'Allow'}
+          </span>
+        )}
+        {perm.tooltip && (
+          <button
+            type="button"
+            onMouseEnter={() => setShowTip(true)}
+            onMouseLeave={() => setShowTip(false)}
+            onFocus={() => setShowTip(true)}
+            onBlur={() => setShowTip(false)}
+            className="text-muted-foreground hover:text-foreground relative"
+            aria-label="More info"
+          >
+            <Info className="w-4 h-4" />
+            {showTip && (
+              <span className="absolute left-6 top-0 z-10 w-72 p-2 rounded-md bg-card border border-border shadow-lg text-xs text-foreground">
+                {perm.tooltip}
+              </span>
+            )}
+          </button>
+        )}
+      </div>
+      <p className="text-sm text-muted-foreground mt-1 ml-12">{perm.description}</p>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { PPPC_PERMISSIONS } from './permissions';
+import { APP_PRIVACY_PERMISSIONS, PPPC_PERMISSIONS } from './permissions';
 import { generateRandomUUID } from './uuid';
 import type {
   AppInfo,
@@ -29,6 +29,11 @@ function createDefaultPermissions(): PermissionsState {
       ...(p.tccService === 'AppleEvents' ? { receivers: [] } : {}),
     };
   }
+  // macOS 27-only App Privacy ids (dictation, localNetwork, location). The
+  // shared ids (camera, accessibility, …) reuse the PPPC state above.
+  for (const p of APP_PRIVACY_PERMISSIONS) {
+    perms[p.id] ??= { enabled: false, authorization: 'Allow' };
+  }
   return perms;
 }
 
@@ -52,6 +57,7 @@ export function makeAppEntry(
     },
     scopeTagIds: ['0'],
     deploymentChannel: 'deviceChannel',
+    privacyJustification: '',
   };
 }
 

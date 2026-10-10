@@ -7,6 +7,7 @@ import {
   ExternalLink,
   AlertTriangle,
   Copy as CopyIcon,
+  Info,
 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from './Card';
 import { AssignmentPicker } from './AssignmentPicker';
@@ -177,6 +178,17 @@ export function DeploymentPanel({
                   onChange={(next) => updateAssignment(key, next)}
                   signedIn={signedIn}
                 />
+                {p.kind !== 'pppc' && (
+                  <div className="flex items-start gap-2 p-2 rounded-md bg-primary/5 text-muted-foreground text-[11px]">
+                    <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-primary" />
+                    <span>
+                      macOS 27 DDM declaration — Apple applies it per user, so
+                      assign it to user groups. For a mixed fleet, deploy a
+                      macOS 26 and a macOS 27 build and split them with an
+                      assignment filter on OS version.
+                    </span>
+                  </div>
+                )}
                 {!valid && (
                   <div className="flex items-center gap-2 p-2 rounded-md bg-warning/10 text-warning text-xs">
                     <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />

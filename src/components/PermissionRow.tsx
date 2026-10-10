@@ -103,6 +103,14 @@ export function PermissionRow({ perm, state, knownApps, onChange }: Props) {
                 Deprecated · macOS {perm.deprecatedIn}
               </span>
             )}
+            {perm.ddmReplacement && (
+              <span
+                className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium"
+                title="Deprecated in macOS 27 — switch the target to macOS 27 to use DDM App Privacy instead"
+              >
+                macOS 27 → App Privacy
+              </span>
+            )}
             {perm.tooltip && (
               <button
                 type="button"
