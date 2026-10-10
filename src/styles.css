@@ -1,11 +1,8 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Theme tokens are defined inside :root / .dark below. `inline` makes
-     utilities read var(--card) etc. directly, so scoped overrides like
-     .code-surface take effect.
-     These @theme declarations register the names so Tailwind utilities like
-     bg-background and text-foreground resolve to var(--color-*). */
+  /* Tokens live in :root / html.dark below. `inline` makes utilities read
+     var(--card) etc. directly, so scoped overrides like .code-surface work. */
   --color-background: var(--bg);
   --color-foreground: var(--fg);
   --color-card: var(--card);
@@ -35,7 +32,7 @@
   --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-/* Light theme (default) — cool graphite neutrals, deep teal accent */
+/* Light theme (default) */
 :root {
   --bg: oklch(0.975 0.004 250);
   --fg: oklch(0.21 0.02 262);
@@ -53,7 +50,6 @@
   --destructive: oklch(0.56 0.2 25);
   --warning: oklch(0.6 0.14 65);
 
-  /* The code editor stays dark in both themes. */
   --code-bg: oklch(0.2 0.015 262);
   --code-chrome: oklch(0.24 0.016 262);
 
@@ -63,8 +59,7 @@
   --bg-glow: oklch(0.9 0.05 182 / 0.35);
 }
 
-/* Dark theme. .code-surface (the preview editor) reuses the dark tokens in
-   both themes so the code panel always reads as a dark editor. */
+/* Dark theme; .code-surface keeps the preview editor dark in both themes. */
 html.dark,
 .code-surface {
   --bg: oklch(0.17 0.008 262);

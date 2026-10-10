@@ -3,23 +3,18 @@ import type { MacOSTarget, PermissionsState, SelectedApp } from './types';
 
 export interface ConversionReport {
   to: MacOSTarget;
-  /** "Teams: Accessibility → App Privacy" */
   moved: string[];
-  /** "Teams: Camera (Deny) — App Privacy has no Deny" */
   dropped: string[];
 }
 
 /**
- * Rewrite each app's permission state when the user flips the macOS target.
- *
+ * Rewrite permission state when the macOS target flips.
  * 26 → 27: the five PPPC services with a `ddmReplacement` move to App Privacy.
  *          Allow / AllowStandardUser become a suggested Allow; Deny cannot be
  *          expressed in DDM and is dropped.
  * 27 → 26: App Privacy entries move back to PPPC Allow where PPPC allows it.
  *          Camera / Microphone (PPPC is deny-only) and Local Network / Location
  *          (no PPPC service) are dropped.
- *
- * Everything dropped is reported by name so nothing disappears silently.
  */
 export function convertApps(
   apps: SelectedApp[],
@@ -74,7 +69,6 @@ export function convertApps(
   return { apps: converted, report };
 }
 
-/** PPPC services that are still PPPC on this target (27 hides the replaced ones). */
 export function pppcPermissionsFor(target: MacOSTarget) {
   return target === '27'
     ? PPPC_PERMISSIONS.filter((p) => !p.ddmReplacement)

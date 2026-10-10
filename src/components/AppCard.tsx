@@ -19,7 +19,6 @@ interface Props {
   item: SelectedApp;
   mode: OutputMode;
   target: MacOSTarget;
-  /** Placeholder for the App Privacy justification (the text used when left empty). */
   justificationPlaceholder: string;
   /** Forwarded to PermissionRow → AppleEventReceiverEditor for the picker. */
   knownApps: KnownApp[];

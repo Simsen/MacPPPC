@@ -13,7 +13,6 @@ interface Props {
 const inputCls =
   'w-full text-sm bg-input border border-border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60';
 
-/** macOS 27 Safari website privacy defaults (camera / microphone per website). */
 export function WebsitePrivacyCard({
   sites,
   defaultJustification,

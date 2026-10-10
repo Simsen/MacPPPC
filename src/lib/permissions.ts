@@ -265,8 +265,7 @@ export const PERMISSION_CATEGORIES: { id: PppcPermission['category']; label: str
 /**
  * macOS 27 DDM App Privacy permission defaults
  * (`com.apple.configuration.app.settings` → `Privacy.PermissionDefaults`).
- * Apple deprecated the matching PPPC keys in 27.0 (see `ddmReplacement`).
- * These are suggestions: the user gets one consent prompt and may decline.
+ * Suggestions only: the user gets one consent prompt and may decline.
  * LocationAccuracy is iOS-only and intentionally omitted.
  */
 export const APP_PRIVACY_PERMISSIONS: AppPrivacyPermission[] = [

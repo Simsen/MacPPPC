@@ -16,7 +16,7 @@ import type { ProfileSettings, SelectedApp, WebsitePrivacy } from './types';
  *   - `com.apple.configuration.app.settings`    → Privacy.PermissionDefaults (per app)
  *   - `com.apple.configuration.safari.settings` → Privacy.PermissionDefaults (per website)
  *
- * Both share one tree, verified against a live POST/GET round-trip in Intune:
+ * Both share one tree (verified with a live Intune round-trip):
  *
  *   {p}_{p}                                       root group
  *    └ {p}_privacy
@@ -25,14 +25,11 @@ import type { ProfileSettings, SelectedApp, WebsitePrivacy } from './types';
  *          └ …_generickey                         the dictionary value
  *             ├ …_organizationjustification       required
  *             └ …_camera / _microphone / …        choice, `_1` = Allow
- *
- * No `.mobileconfig` form exists — DDM declarations only deploy via Settings Catalog.
  */
 
 interface Entry {
   key: string;
   justification: string;
-  /** ddmKey + choice suffix */
   choices: { ddmKey: string; suffix: string }[];
 }
 
@@ -67,7 +64,6 @@ function orgName(settings: ProfileSettings): string {
   return settings.organization.trim() || 'Your organization';
 }
 
-/** Consent-prompt text used when neither the app nor the profile sets one. */
 export function defaultAppJustification(settings: ProfileSettings, appName: string): string {
   return (
     settings.privacyJustification.trim() ||
@@ -88,12 +84,10 @@ export function defaultWebsiteJustification(
   );
 }
 
-/** Apps with at least one App Privacy permission enabled. */
 export function appPrivacyApps(apps: SelectedApp[]): SelectedApp[] {
   return apps.filter((a) => APP_PRIVACY_PERMISSIONS.some((p) => a.permissions[p.id]?.enabled));
 }
 
-/** Websites that would actually emit an entry. */
 export function activeWebsites(sites: WebsitePrivacy[]): WebsitePrivacy[] {
   return sites.filter((s) => s.domain.trim() !== '' && (s.camera || s.microphone));
 }

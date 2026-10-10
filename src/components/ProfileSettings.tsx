@@ -7,7 +7,6 @@ interface Props {
   value: ProfileSettingsType;
   onChange: (next: ProfileSettingsType) => void;
   contextLabel?: string;
-  /** macOS 27: show the default App Privacy / Safari justification field. */
   showPrivacyJustification?: boolean;
 }
 

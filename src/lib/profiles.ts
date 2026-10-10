@@ -45,7 +45,6 @@ function buildContent(
     : null;
 }
 
-/** Keep only the permission states that are PPPC on this target. */
 function pppcOnly(apps: SelectedApp[], target: MacOSTarget): SelectedApp[] {
   const ids = new Set(pppcPermissionsFor(target).map((p) => p.id));
   return apps.map((a) => ({
@@ -66,12 +65,8 @@ function pppcLabels(apps: SelectedApp[], target: MacOSTarget, withAppName: boole
 }
 
 /**
- * Generate every deployment profile for the current build.
- *
- * macOS 26: PPPC only (see generatePppcProfiles).
- * macOS 27: PPPC for the services that are still PPPC, plus up to two DDM
- *           Settings Catalog policies — App Privacy (apps) and Safari Privacy
- *           (websites). The DDM policies are always one bundle each.
+ * macOS 27 adds up to two DDM Settings Catalog policies (App Privacy, Safari
+ * Privacy) next to the PPPC profiles for the services that are still PPPC.
  */
 export function generateProfiles(
   apps: SelectedApp[],

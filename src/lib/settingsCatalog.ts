@@ -315,7 +315,6 @@ export function buildSettingsCatalogPolicy(
   return wrapPolicy(settings, root, 'PPPC Configuration');
 }
 
-/** Wrap one root setting instance in the configurationPolicies body Intune exports. */
 export function wrapPolicy(
   settings: ProfileSettings,
   root: SettingInstance,

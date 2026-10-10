@@ -60,7 +60,6 @@ export function CardHeader({
   );
 }
 
-/** Selectable tile used for every either/or choice (target, output, format, assignment, channel). */
 export function Choice({
   active,
   onClick,

@@ -38,7 +38,6 @@ export interface PppcPermission {
   ddmReplacement?: string;
 }
 
-/** Which macOS generation the profiles target. 27 moves some PPPC services to DDM App Privacy. */
 export type MacOSTarget = '26' | '27';
 
 /**
@@ -57,7 +56,6 @@ export interface AppPrivacyPermission {
   tooltip?: string;
 }
 
-/** One Safari website privacy default (macOS 27 DDM `safari.settings` → `Privacy`). */
 export interface WebsitePrivacy {
   id: number;
   /** "example.com" or "*example.com" (domain + sub-domains). */
@@ -117,7 +115,7 @@ export interface SelectedApp {
   scopeTagIds: string[];
   /** Intune deployment channel for this profile. Defaults to 'deviceChannel'. */
   deploymentChannel: DeploymentChannel;
-  /** macOS 27 App Privacy consent-prompt text for this app. Empty = profile default. */
+  /** Empty = profile default. */
   privacyJustification: string;
 }
 
@@ -130,7 +128,6 @@ export interface ProfileSettings {
   scopeTagIds: string[];
   /** Intune deployment channel for the bundled policy. */
   deploymentChannel: DeploymentChannel;
-  /** macOS 27 default consent-prompt text for App Privacy / Safari Privacy. */
   privacyJustification: string;
 }
 
@@ -159,8 +156,6 @@ export interface GeneratedProfile {
   scopeTagIds: string[];
   /** Intune deployment channel ('deviceChannel' or 'userChannel'). */
   deploymentChannel: DeploymentChannel;
-  /** PPPC profile, or one of the macOS 27 DDM privacy declarations. */
   kind: 'pppc' | 'appPrivacy' | 'safariPrivacy';
-  /** Human-readable list of what this profile configures (preview chips). */
   labels: string[];
 }
