@@ -88,8 +88,31 @@ export function appPrivacyApps(apps: SelectedApp[]): SelectedApp[] {
   return apps.filter((a) => APP_PRIVACY_PERMISSIONS.some((p) => a.permissions[p.id]?.enabled));
 }
 
+const DOMAIN = /^\*?(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9-]{2,}$/;
+
+/** Safari key ("example.com" / "*example.com"), or null if not a valid domain. Strips scheme and path. */
+export function websiteKey(raw: string): string | null {
+  const key = raw.trim().toLowerCase().replace(/^[a-z]+:\/\//, '').split(/[/?#]/)[0];
+  return DOMAIN.test(key) ? key : null;
+}
+
+export function websiteDomainError(site: WebsitePrivacy, all: WebsitePrivacy[]): string | null {
+  if (site.domain.trim() === '') return null;
+  const key = websiteKey(site.domain);
+  if (!key) return 'Use a domain such as example.com or *example.com (domain + sub-domains).';
+  const first = all.find((s) => websiteKey(s.domain) === key);
+  return first && first.id !== site.id ? `${key} is already listed; only the first entry is used.` : null;
+}
+
+/** Valid, de-duplicated websites with at least one permission (first entry per domain wins). */
 export function activeWebsites(sites: WebsitePrivacy[]): WebsitePrivacy[] {
-  return sites.filter((s) => s.domain.trim() !== '' && (s.camera || s.microphone));
+  const seen = new Set<string>();
+  return sites.flatMap((s) => {
+    const key = websiteKey(s.domain);
+    if (!key || seen.has(key) || !(s.camera || s.microphone)) return [];
+    seen.add(key);
+    return [{ ...s, domain: key }];
+  });
 }
 
 export function buildAppPrivacyPolicy(
@@ -118,7 +141,7 @@ export function buildSafariPrivacyPolicy(
   settings: ProfileSettings,
 ): SettingsCatalogPolicy | null {
   const entries: Entry[] = activeWebsites(sites).map((s) => ({
-    key: s.domain.trim(),
+    key: s.domain,
     justification: s.justification.trim() || defaultWebsiteJustification(settings, s),
     choices: [
       ...(s.camera ? [{ ddmKey: 'camera', suffix: '1' }] : []),

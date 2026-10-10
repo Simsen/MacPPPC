@@ -80,26 +80,50 @@ export function generateProfiles(
   const out = generatePppcProfiles(pppcOnly(apps, target), shared, mode, format, target, innerUUID);
   if (target === '26') return out;
 
-  // ponytail: DDM policies are always bundled, even in 'separate' mode. Split per app if asked.
   const base = shared.payloadName || 'macOS 27';
-  const ddm = [
-    {
-      kind: 'appPrivacy' as const,
-      name: `${base} - App Privacy`,
-      policy: buildAppPrivacyPolicy(apps, { ...shared, payloadName: `${base} - App Privacy` }),
-      labels: appPrivacyApps(apps).flatMap((a) =>
-        APP_PRIVACY_PERMISSIONS.filter((p) => a.permissions[p.id]?.enabled).map(
-          (p) => `${a.app.displayName} · ${p.name}`,
-        ),
+  const privacyLabels = (list: SelectedApp[], withAppName: boolean) =>
+    list.flatMap((a) =>
+      APP_PRIVACY_PERMISSIONS.filter((p) => a.permissions[p.id]?.enabled).map((p) =>
+        withAppName ? `${a.app.displayName} · ${p.name}` : p.name,
       ),
-    },
+    );
+  // Separate mode: one App Privacy policy per app, named and tagged like its PPPC profile,
+  // so a per-app assignment only delivers that app's defaults.
+  const appPolicies =
+    mode === 'separate'
+      ? appPrivacyApps(apps).map((a) => ({
+          settings: {
+            ...shared,
+            organization: a.profile.organization || shared.organization,
+            payloadName: `${a.profile.name || `PPPC - ${a.app.displayName}`} - App Privacy`,
+            payloadDescription: a.profile.description || shared.payloadDescription,
+            scopeTagIds: a.scopeTagIds,
+            deploymentChannel: a.deploymentChannel,
+          },
+          apps: [a],
+          labels: privacyLabels([a], false),
+        }))
+      : [
+          {
+            settings: { ...shared, payloadName: `${base} - App Privacy` },
+            apps,
+            labels: privacyLabels(apps, true),
+          },
+        ];
+  const ddm = [
+    ...appPolicies.map((p) => ({
+      kind: 'appPrivacy' as const,
+      settings: p.settings,
+      policy: buildAppPrivacyPolicy(p.apps, p.settings),
+      labels: p.labels,
+    })),
     {
       kind: 'safariPrivacy' as const,
-      name: `${base} - Safari Privacy`,
+      settings: { ...shared, payloadName: `${base} - Safari Privacy` },
       policy: buildSafariPrivacyPolicy(websites, { ...shared, payloadName: `${base} - Safari Privacy` }),
       labels: activeWebsites(websites).map(
         (s) =>
-          `${s.domain.trim()} · ${[s.camera && 'Camera', s.microphone && 'Microphone']
+          `${s.domain} · ${[s.camera && 'Camera', s.microphone && 'Microphone']
             .filter(Boolean)
             .join(' + ')}`,
       ),
@@ -108,13 +132,13 @@ export function generateProfiles(
   for (const d of ddm) {
     if (!d.policy) continue;
     out.push({
-      filename: `${safeFilename(d.name)}.json`,
-      policyName: d.name,
-      description: shared.payloadDescription,
+      filename: `${safeFilename(d.settings.payloadName)}.json`,
+      policyName: d.settings.payloadName,
+      description: d.settings.payloadDescription,
       content: serializeSettingsCatalogPolicy(d.policy),
       format: 'settingsCatalog',
-      scopeTagIds: shared.scopeTagIds.length > 0 ? shared.scopeTagIds : ['0'],
-      deploymentChannel: shared.deploymentChannel,
+      scopeTagIds: d.settings.scopeTagIds.length > 0 ? d.settings.scopeTagIds : ['0'],
+      deploymentChannel: d.settings.deploymentChannel,
       kind: d.kind,
       labels: d.labels,
     });

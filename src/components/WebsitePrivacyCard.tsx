@@ -1,6 +1,8 @@
 import { Globe, Plus, Trash2 } from 'lucide-react';
 import { Card, CardHeader, CardBody } from './Card';
 import type { WebsitePrivacy } from '@/lib/types';
+import { websiteDomainError } from '@/lib/ddmPrivacy';
+import { cn } from '@/lib/cn';
 
 interface Props {
   sites: WebsitePrivacy[];
@@ -45,19 +47,26 @@ export function WebsitePrivacyCard({
             sub-domains). Safari shows the user one consent prompt per website.
           </p>
         )}
-        {sites.map((s) => (
+        {sites.map((s) => {
+          const domainError = websiteDomainError(s, sites);
+          return (
           <div
             key={s.id}
             className="rounded-lg border border-border bg-card-elevated/40 p-3.5 space-y-2.5"
           >
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
               <input
                 type="text"
                 value={s.domain}
                 onChange={(e) => onChange(s.id, { ...s, domain: e.target.value })}
                 placeholder="*example.com"
                 aria-label="Website"
-                className={`${inputCls} font-mono flex-1`}
+                aria-invalid={!!domainError}
+                className={cn(
+                  inputCls,
+                  'font-mono basis-full sm:basis-0 sm:flex-1 min-w-0',
+                  domainError && 'border-destructive/60',
+                )}
               />
               <label className="inline-flex items-center gap-2 text-sm cursor-pointer select-none">
                 <input
@@ -80,12 +89,13 @@ export function WebsitePrivacyCard({
               <button
                 type="button"
                 onClick={() => onRemove(s.id)}
-                className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition"
+                className="ml-auto p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition"
                 aria-label="Remove website"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
+            {domainError && <p className="text-xs text-destructive">{domainError}</p>}
             <input
               type="text"
               value={s.justification}
@@ -95,7 +105,8 @@ export function WebsitePrivacyCard({
               className={inputCls}
             />
           </div>
-        ))}
+          );
+        })}
       </CardBody>
     </Card>
   );

@@ -182,8 +182,9 @@ export function DeploymentPanel({
                   <div className="flex items-start gap-2 p-3 rounded-lg border border-info/25 bg-info/[0.06] text-muted-foreground text-xs">
                     <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-info" />
                     <span>
-                      macOS 27 DDM declaration — Apple applies it per user, so
-                      assign it to user groups. For a mixed fleet, deploy a
+                      macOS 27 DDM declaration — Apple applies it in user scope
+                      only, so it reaches Macs enrolled with user affinity.
+                      Prefer user groups. For a mixed fleet, deploy a
                       macOS 26 and a macOS 27 build and split them with an
                       assignment filter on OS version.
                     </span>
