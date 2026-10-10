@@ -23,9 +23,9 @@ export const PPPC_PERMISSIONS: PppcPermission[] = [
     authMode: 'standard',
     category: 'common',
     ddmReplacement: 'accessibility',
-    deprecatedIn: '26.2',
+    deprecatedIn: '27.0',
     tooltip:
-      'Apple deprecated this service in macOS 26.2 in favour of finer-grained services, but it is still required for older systems.',
+      'Apple deprecated this service in macOS 27 in favour of DDM App Privacy, but it is still required for macOS 26 and earlier.',
   },
   {
     id: 'fullDiskAccess',

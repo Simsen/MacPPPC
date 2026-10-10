@@ -266,7 +266,7 @@ export default function App() {
                   {target === '27' && (
                     <WebsitePrivacyCard
                       sites={websites}
-                      defaultJustification={defaultWebsiteJustification(settings)}
+                      defaultJustification={(site) => defaultWebsiteJustification(settings, site)}
                       onAdd={() => {
                         setWebsites((prev) => [
                           ...prev,

@@ -4,7 +4,7 @@ import type { WebsitePrivacy } from '@/lib/types';
 
 interface Props {
   sites: WebsitePrivacy[];
-  defaultJustification: string;
+  defaultJustification: (site: WebsitePrivacy) => string;
   onAdd: () => void;
   onChange: (id: number, next: WebsitePrivacy) => void;
   onRemove: (id: number) => void;
@@ -26,7 +26,7 @@ export function WebsitePrivacyCard({
       <CardHeader
         icon={<Globe className="w-4 h-4" />}
         title="Safari website privacy"
-        subtitle="macOS 27 · Suggest camera / microphone access for websites in Safari"
+        subtitle="macOS 27 · supervised Macs · Suggest camera / microphone access for websites in Safari"
         actions={
           <button
             type="button"
@@ -91,7 +91,7 @@ export function WebsitePrivacyCard({
               type="text"
               value={s.justification}
               onChange={(e) => onChange(s.id, { ...s, justification: e.target.value })}
-              placeholder={defaultJustification}
+              placeholder={defaultJustification(s)}
               aria-label="Justification shown to the user"
               className={inputCls}
             />

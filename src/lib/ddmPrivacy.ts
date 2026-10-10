@@ -75,10 +75,16 @@ export function defaultAppJustification(settings: ProfileSettings, appName: stri
   );
 }
 
-export function defaultWebsiteJustification(settings: ProfileSettings): string {
+export function defaultWebsiteJustification(
+  settings: ProfileSettings,
+  site: Pick<WebsitePrivacy, 'camera' | 'microphone'>,
+): string {
+  const what = [site.camera && 'camera', site.microphone && 'microphone']
+    .filter(Boolean)
+    .join(' and ');
   return (
     settings.privacyJustification.trim() ||
-    `${orgName(settings)} requires camera and microphone access for this website.`
+    `${orgName(settings)} requires ${what || 'camera and microphone'} access for this website.`
   );
 }
 
@@ -119,7 +125,7 @@ export function buildSafariPrivacyPolicy(
 ): SettingsCatalogPolicy | null {
   const entries: Entry[] = activeWebsites(sites).map((s) => ({
     key: s.domain.trim(),
-    justification: s.justification.trim() || defaultWebsiteJustification(settings),
+    justification: s.justification.trim() || defaultWebsiteJustification(settings, s),
     choices: [
       ...(s.camera ? [{ ddmKey: 'camera', suffix: '1' }] : []),
       ...(s.microphone ? [{ ddmKey: 'microphone', suffix: '1' }] : []),

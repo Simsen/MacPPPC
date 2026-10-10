@@ -245,6 +245,7 @@ export function AppCard({
             <p className="px-3 pb-1 text-xs text-muted-foreground">
               Enabled permissions are suggested as Allow in one consent prompt.
               The user can decline. Deployed as a separate Settings Catalog policy.
+              Requires a supervised Mac (ADE) and only works for AppKit apps.
             </p>
             {APP_PRIVACY_PERMISSIONS.map((perm) => (
               <AppPrivacyRow
