@@ -57,7 +57,7 @@ const IDENTIFIER_TYPE_SUFFIX = {
 
 // ─── Type model ─────────────────────────────────────────────────────────────
 
-type SettingInstance = GroupCollectionInstance | ChoiceInstance | SimpleStringInstance;
+export type SettingInstance = GroupCollectionInstance | ChoiceInstance | SimpleStringInstance;
 
 interface ValueWrapper {
   settingValueTemplateReference: null;
@@ -144,15 +144,15 @@ function effectiveAuthorization(mode: AuthMode, requested: Authorization): Autho
   }
 }
 
-function defaultCodeRequirement(bundleId: string): string {
+export function defaultCodeRequirement(bundleId: string): string {
   return `identifier "${bundleId}" and anchor apple generic`;
 }
 
-function valueWrapper(children: SettingInstance[]): ValueWrapper {
+export function valueWrapper(children: SettingInstance[]): ValueWrapper {
   return { settingValueTemplateReference: null, children };
 }
 
-function simple(settingDefinitionId: string, value: string): SimpleStringInstance {
+export function simple(settingDefinitionId: string, value: string): SimpleStringInstance {
   return {
     '@odata.type': TYPE_SIMPLE,
     settingDefinitionId,
@@ -166,7 +166,7 @@ function simple(settingDefinitionId: string, value: string): SimpleStringInstanc
   };
 }
 
-function choice(settingDefinitionId: string, valueSuffix: string): ChoiceInstance {
+export function choice(settingDefinitionId: string, valueSuffix: string): ChoiceInstance {
   return {
     '@odata.type': TYPE_CHOICE,
     settingDefinitionId,
@@ -180,7 +180,7 @@ function choice(settingDefinitionId: string, valueSuffix: string): ChoiceInstanc
   };
 }
 
-function groupColl(
+export function groupColl(
   settingDefinitionId: string,
   values: ValueWrapper[],
 ): GroupCollectionInstance {
@@ -312,8 +312,16 @@ export function buildSettingsCatalogPolicy(
     valueWrapper([groupColl(SERVICES_ID, [valueWrapper(serviceInstances)])]),
   ]);
 
+  return wrapPolicy(settings, root, 'PPPC Configuration');
+}
+
+export function wrapPolicy(
+  settings: ProfileSettings,
+  root: SettingInstance,
+  fallbackName: string,
+): SettingsCatalogPolicy {
   return {
-    name: settings.payloadName || 'PPPC Configuration',
+    name: settings.payloadName || fallbackName,
     description: settings.payloadDescription || '',
     platforms: 'macOS',
     technologies: 'mdm,appleRemoteManagement',

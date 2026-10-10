@@ -23,7 +23,7 @@ interface Props {
 }
 
 const inputCls =
-  'w-full bg-input/60 border border-border/60 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60 transition';
+  'w-full bg-input border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60 transition';
 
 /**
  * Per-policy name + description + scope tag editor on the Deploy step.
@@ -87,7 +87,7 @@ export function PolicyList({
           {apps.map((a) => (
             <div
               key={a.id}
-              className="rounded-md border border-border/60 bg-card-elevated/30 p-3 space-y-3"
+              className="rounded-xl border border-border bg-card-elevated/40 p-4 space-y-3"
             >
               <div className="flex items-center gap-2">
                 <div className="text-xs text-muted-foreground font-mono truncate">
@@ -237,7 +237,7 @@ function BulkPattern({
   }
 
   return (
-    <div className="rounded-md border border-border/60 bg-background/30 p-3">
+    <div className="rounded-lg border border-border bg-card-elevated/40 p-3">
       <div className="flex items-center gap-2 mb-2">
         <Wand2 className="w-3.5 h-3.5 text-muted-foreground" />
         <div className="section-label">Bulk rename</div>
@@ -270,7 +270,7 @@ function BulkPattern({
         <button
           type="button"
           onClick={apply}
-          className="px-3 py-1.5 text-sm rounded-md bg-primary text-primary-foreground font-medium hover:bg-primary-strong transition shadow-sm"
+          className="px-4 py-2 text-sm rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary-strong transition shadow-sm"
         >
           Apply to all
         </button>

@@ -10,6 +10,7 @@ import type {
 } from '@/lib/types';
 import { cn } from '@/lib/cn';
 import { AppleEventReceiverEditor } from './AppleEventReceiverEditor';
+import { Switch } from './Card';
 
 interface Props {
   perm: PppcPermission;
@@ -65,42 +66,34 @@ export function PermissionRow({ perm, state, knownApps, onChange }: Props) {
   const effectiveAuth = clampForMode(perm.authMode, state.authorization);
 
   return (
-    <div className="p-3 rounded-md hover:bg-background/30 transition">
+    <div className={cn('px-3 py-3 rounded-lg transition', state.enabled ? 'bg-primary/[0.04]' : 'hover:bg-card-elevated/60')}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={toggle}
-              role="switch"
-              aria-checked={state.enabled}
-              className={cn(
-                'relative inline-flex h-5 w-9 items-center rounded-full transition',
-                state.enabled ? 'bg-primary' : 'bg-muted',
-              )}
-            >
-              <span
-                className={cn(
-                  'inline-block h-4 w-4 transform rounded-full bg-white transition',
-                  state.enabled ? 'translate-x-4' : 'translate-x-0.5',
-                )}
-              />
-            </button>
-            <span className="font-medium">{perm.name}</span>
-            <span className="text-[10px] font-mono text-muted-foreground/70 px-1 py-0.5 rounded bg-muted/30">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Switch checked={state.enabled} onChange={toggle} label={perm.name} />
+            <span className="text-sm font-medium">{perm.name}</span>
+            <span className="text-[10px] font-mono text-muted-foreground px-1.5 py-0.5 rounded-md bg-muted/60 border border-border/60">
               {perm.tccService}
             </span>
             {perm.minMacOS && (
-              <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-muted/60 text-muted-foreground font-medium">
+              <span className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded-full border border-border text-muted-foreground font-medium">
                 macOS {perm.minMacOS}+
               </span>
             )}
             {perm.deprecatedIn && (
               <span
-                className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 font-medium"
+                className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-warning/12 text-warning font-medium"
                 title={`Deprecated by Apple in macOS ${perm.deprecatedIn}`}
               >
                 Deprecated · macOS {perm.deprecatedIn}
+              </span>
+            )}
+            {perm.ddmReplacement && (
+              <span
+                className="text-[9px] uppercase tracking-wide px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium"
+                title="Deprecated in macOS 27 — switch the target to macOS 27 to use DDM App Privacy instead"
+              >
+                macOS 27 → App Privacy
               </span>
             )}
             {perm.tooltip && (
@@ -115,14 +108,14 @@ export function PermissionRow({ perm, state, knownApps, onChange }: Props) {
               >
                 <Info className="w-4 h-4" />
                 {showTip && (
-                  <span className="absolute left-6 top-0 z-10 w-72 p-2 rounded-md bg-card border border-border shadow-lg text-xs text-foreground">
+                  <span className="absolute left-6 top-0 z-10 w-72 p-3 rounded-lg bg-card border border-border shadow-[var(--shadow-lift)] text-xs text-foreground font-normal normal-case tracking-normal">
                     {perm.tooltip}
                   </span>
                 )}
               </button>
             )}
           </div>
-          <p className="text-sm text-muted-foreground mt-1 ml-12">
+          <p className="text-[13px] text-muted-foreground mt-1 ml-11">
             {perm.description}
           </p>
         </div>
@@ -131,7 +124,7 @@ export function PermissionRow({ perm, state, knownApps, onChange }: Props) {
             value={effectiveAuth}
             disabled={perm.authMode === 'denyOnly'}
             onChange={(e) => setAuth(e.target.value as Authorization)}
-            className="text-sm bg-background border border-border rounded-md px-2 py-1.5 min-w-[180px] disabled:opacity-60"
+            className="text-[13px] bg-card border border-border rounded-md px-2.5 py-1.5 min-w-[180px] shadow-sm focus:outline-none focus:ring-2 focus:ring-ring/40 disabled:opacity-60"
           >
             {allowed.map((value) => (
               <option key={value} value={value}>

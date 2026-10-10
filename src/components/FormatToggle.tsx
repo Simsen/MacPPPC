@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FileCode2, FileJson, Info } from 'lucide-react';
 import type { DeploymentFormat } from '@/lib/types';
-import { cn } from '@/lib/cn';
+import { Choice } from './Card';
 
 interface Props {
   value: DeploymentFormat;
@@ -12,7 +12,7 @@ export function FormatToggle({ value, onChange }: Props) {
   const [showHelp, setShowHelp] = useState(false);
 
   return (
-    <div className="px-5 py-3 border-b border-border/60 bg-card-elevated/30">
+    <div className="px-6 pt-4 pb-5 border-b border-border">
       <div className="flex items-center gap-1.5 mb-2">
         <div className="section-label">Deployment format</div>
         <button
@@ -26,7 +26,7 @@ export function FormatToggle({ value, onChange }: Props) {
         >
           <Info className="w-3.5 h-3.5" />
           {showHelp && (
-            <div className="absolute left-0 top-5 z-20 w-[340px] p-3 rounded-md bg-card border border-border shadow-lg text-[11px] text-foreground text-left space-y-2">
+            <div className="absolute left-0 top-5 z-20 w-[340px] p-3.5 rounded-lg bg-card border border-border shadow-[var(--shadow-lift)] text-[11px] text-foreground text-left space-y-2">
               <p>
                 Both formats deploy the <strong>same 24 PPPC services</strong>{' '}
                 with identical capabilities — the choice affects how the policy
@@ -53,15 +53,15 @@ export function FormatToggle({ value, onChange }: Props) {
           )}
         </button>
       </div>
-      <div className="grid grid-cols-2 gap-2">
-        <FormatButton
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <Choice
           active={value === 'classic'}
           onClick={() => onChange('classic')}
           icon={<FileCode2 className="w-4 h-4" />}
           title="Templates › Custom"
           subtitle=".mobileconfig · macOSCustomConfiguration"
         />
-        <FormatButton
+        <Choice
           active={value === 'settingsCatalog'}
           onClick={() => onChange('settingsCatalog')}
           icon={<FileJson className="w-4 h-4" />}
@@ -73,44 +73,3 @@ export function FormatToggle({ value, onChange }: Props) {
   );
 }
 
-function FormatButton({
-  active,
-  onClick,
-  icon,
-  title,
-  subtitle,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        'flex items-start gap-2.5 p-3 rounded-md border text-left transition',
-        active
-          ? 'border-primary/50 bg-primary/8 ring-1 ring-primary/40'
-          : 'border-border/60 hover:bg-card-elevated/60',
-      )}
-    >
-      <div
-        className={cn(
-          'mt-0.5 w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0',
-          active ? 'bg-primary/15 text-primary' : 'bg-card text-muted-foreground',
-        )}
-      >
-        {icon}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium">{title}</div>
-        <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
-          {subtitle}
-        </div>
-      </div>
-    </button>
-  );
-}

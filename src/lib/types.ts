@@ -34,6 +34,35 @@ export interface PppcPermission {
   /** macOS version in which Apple deprecated this service. Informational only. */
   deprecatedIn?: string;
   tooltip?: string;
+  /** macOS 27+: id of the APP_PRIVACY_PERMISSIONS entry that replaces this PPPC service. */
+  ddmReplacement?: string;
+}
+
+export type MacOSTarget = '26' | '27';
+
+/**
+ * A permission in the macOS 27 DDM `com.apple.configuration.app.settings` →
+ * `Privacy.PermissionDefaults` dictionary. Enabled = suggest the allow value;
+ * DDM has no Deny, so there is nothing else to pick.
+ */
+export interface AppPrivacyPermission {
+  id: string;
+  name: string;
+  description: string;
+  /** Lowercased key Intune uses in the setting definition id. */
+  ddmKey: string;
+  /** Choice-option suffix for the allow value (`_1` = Allow, Location `_2` = Always). */
+  allowSuffix: string;
+  tooltip?: string;
+}
+
+export interface WebsitePrivacy {
+  id: number;
+  /** "example.com" or "*example.com" (domain + sub-domains). */
+  domain: string;
+  camera: boolean;
+  microphone: boolean;
+  justification: string;
 }
 
 export interface KnownApp {
@@ -86,6 +115,8 @@ export interface SelectedApp {
   scopeTagIds: string[];
   /** Intune deployment channel for this profile. Defaults to 'deviceChannel'. */
   deploymentChannel: DeploymentChannel;
+  /** Empty = profile default. */
+  privacyJustification: string;
 }
 
 export interface ProfileSettings {
@@ -97,6 +128,7 @@ export interface ProfileSettings {
   scopeTagIds: string[];
   /** Intune deployment channel for the bundled policy. */
   deploymentChannel: DeploymentChannel;
+  privacyJustification: string;
 }
 
 export type OutputMode = 'bundle' | 'separate';
@@ -124,4 +156,6 @@ export interface GeneratedProfile {
   scopeTagIds: string[];
   /** Intune deployment channel ('deviceChannel' or 'userChannel'). */
   deploymentChannel: DeploymentChannel;
+  kind: 'pppc' | 'appPrivacy' | 'safariPrivacy';
+  labels: string[];
 }

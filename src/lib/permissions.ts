@@ -1,4 +1,4 @@
-import type { PppcPermission } from './types';
+import type { AppPrivacyPermission, PppcPermission } from './types';
 
 /**
  * The 24 PPPC services Apple exposes via the
@@ -22,9 +22,10 @@ export const PPPC_PERMISSIONS: PppcPermission[] = [
     tccService: 'Accessibility',
     authMode: 'standard',
     category: 'common',
-    deprecatedIn: '26.2',
+    ddmReplacement: 'accessibility',
+    deprecatedIn: '27.0',
     tooltip:
-      'Apple deprecated this service in macOS 26.2 in favour of finer-grained services, but it is still required for older systems.',
+      'Apple deprecated this service in macOS 27 in favour of DDM App Privacy, but it is still required for macOS 26 and earlier.',
   },
   {
     id: 'fullDiskAccess',
@@ -55,6 +56,7 @@ export const PPPC_PERMISSIONS: PppcPermission[] = [
     tccService: 'Camera',
     authMode: 'denyOnly',
     category: 'hardware',
+    ddmReplacement: 'camera',
     tooltip:
       'Apple does not permit MDM to pre-approve or allow camera access — only Deny has effect. User must grant via System Settings.',
   },
@@ -65,6 +67,7 @@ export const PPPC_PERMISSIONS: PppcPermission[] = [
     tccService: 'Microphone',
     authMode: 'denyOnly',
     category: 'hardware',
+    ddmReplacement: 'microphone',
     tooltip:
       'Apple does not permit MDM to pre-approve or allow microphone access — only Deny has effect. User must grant via System Settings.',
   },
@@ -107,6 +110,7 @@ export const PPPC_PERMISSIONS: PppcPermission[] = [
     tccService: 'BluetoothAlways',
     authMode: 'standard',
     category: 'hardware',
+    ddmReplacement: 'bluetooth',
   },
 
   // ─── Personal Data ───────────────────────────────────────────────────────
@@ -159,6 +163,7 @@ export const PPPC_PERMISSIONS: PppcPermission[] = [
     tccService: 'SpeechRecognition',
     authMode: 'standard',
     category: 'personalData',
+    ddmReplacement: 'dictation',
     tooltip: 'Only meaningful for apps using SFSpeechRecognizer.',
   },
 
@@ -255,4 +260,66 @@ export const PERMISSION_CATEGORIES: { id: PppcPermission['category']; label: str
   { id: 'personalData', label: 'Personal Data' },
   { id: 'fileAccess', label: 'File Access' },
   { id: 'appControl', label: 'App Control' },
+];
+
+/**
+ * macOS 27 DDM App Privacy permission defaults
+ * (`com.apple.configuration.app.settings` → `Privacy.PermissionDefaults`).
+ * Suggestions only: the user gets one consent prompt and may decline.
+ * LocationAccuracy is iOS-only and intentionally omitted.
+ */
+export const APP_PRIVACY_PERMISSIONS: AppPrivacyPermission[] = [
+  {
+    id: 'accessibility',
+    name: 'Accessibility',
+    description: 'Control your computer using accessibility features',
+    ddmKey: 'accessibility',
+    allowSuffix: '1',
+  },
+  {
+    id: 'camera',
+    name: 'Camera',
+    description: 'Access the camera',
+    ddmKey: 'camera',
+    allowSuffix: '1',
+  },
+  {
+    id: 'microphone',
+    name: 'Microphone',
+    description: 'Access the microphone',
+    ddmKey: 'microphone',
+    allowSuffix: '1',
+  },
+  {
+    id: 'bluetooth',
+    name: 'Bluetooth',
+    description: 'Use Bluetooth devices',
+    ddmKey: 'bluetooth',
+    allowSuffix: '1',
+  },
+  {
+    id: 'dictation',
+    name: 'Dictation',
+    description: 'Use dictation / speech recognition',
+    ddmKey: 'dictation',
+    allowSuffix: '1',
+    tooltip: 'Replaces the PPPC SpeechRecognition service on macOS 27. Close, but not guaranteed to be identical.',
+  },
+  {
+    id: 'localNetwork',
+    name: 'Local Network',
+    description: 'Find and connect to devices on the local network',
+    ddmKey: 'localnetwork',
+    allowSuffix: '1',
+    tooltip: 'New in macOS 27 — there is no PPPC equivalent.',
+  },
+  {
+    id: 'location',
+    name: 'Location',
+    description: 'Access the Mac\'s location (always)',
+    ddmKey: 'location',
+    // ponytail: only "Always" — Apple documents WhileUsing as equal to Always on macOS.
+    allowSuffix: '2',
+    tooltip: 'New in macOS 27 — there is no PPPC equivalent. On macOS "While using" behaves as "Always", so only Always is offered.',
+  },
 ];

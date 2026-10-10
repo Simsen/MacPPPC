@@ -29,7 +29,7 @@ export function ThemeToggle() {
 
   return (
     <div
-      className="inline-flex items-center gap-0.5 p-0.5 rounded-md border border-border bg-card-elevated/40"
+      className="inline-flex items-center gap-0.5 p-[3px] rounded-lg border border-border bg-muted/50"
       role="radiogroup"
       aria-label="Theme"
     >
@@ -77,9 +77,9 @@ function Btn({
       aria-label={title}
       aria-pressed={active}
       className={cn(
-        'p-1 rounded transition',
+        'p-1.5 rounded-md transition',
         active
-          ? 'bg-card text-foreground shadow-sm'
+          ? 'bg-card text-foreground shadow-sm ring-1 ring-border'
           : 'text-muted-foreground hover:text-foreground',
       )}
     >

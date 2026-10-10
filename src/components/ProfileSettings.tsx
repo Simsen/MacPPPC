@@ -7,12 +7,13 @@ interface Props {
   value: ProfileSettingsType;
   onChange: (next: ProfileSettingsType) => void;
   contextLabel?: string;
+  showPrivacyJustification?: boolean;
 }
 
 const inputCls =
-  'w-full bg-input/60 border border-border/60 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring/60 transition';
+  'w-full bg-input border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring/40 focus:border-ring/60 transition';
 
-export function ProfileSettings({ value, onChange, contextLabel }: Props) {
+export function ProfileSettings({ value, onChange, contextLabel, showPrivacyJustification }: Props) {
   function update<K extends keyof ProfileSettingsType>(
     key: K,
     next: ProfileSettingsType[K],
@@ -62,7 +63,7 @@ export function ProfileSettings({ value, onChange, contextLabel }: Props) {
                 type="button"
                 onClick={() => update('payloadIdentifier', generateRandomUUID())}
                 title="Generate new UUID"
-                className="px-3 rounded-md border border-border/60 hover:bg-card-elevated text-muted-foreground hover:text-foreground transition"
+                className="px-3 rounded-md border border-border hover:bg-card-elevated text-muted-foreground hover:text-foreground transition"
               >
                 <RefreshCw className="w-4 h-4" />
               </button>
@@ -77,6 +78,22 @@ export function ProfileSettings({ value, onChange, contextLabel }: Props) {
               className={inputCls}
             />
           </Field>
+          {showPrivacyJustification && (
+            <div className="md:col-span-2">
+              <Field label="Privacy justification (macOS 27)" optional>
+                <input
+                  type="text"
+                  value={value.privacyJustification}
+                  onChange={(e) => update('privacyJustification', e.target.value)}
+                  placeholder={`${value.organization.trim() || 'Your organization'} requires these permissions for <app>.`}
+                  className={inputCls}
+                />
+              </Field>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Shown in the consent prompt for every app and website that has no text of its own.
+              </p>
+            </div>
+          )}
         </div>
       </CardBody>
     </Card>
@@ -94,7 +111,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-muted-foreground mb-1.5 tracking-wide uppercase">
+      <label className="block text-xs font-medium text-muted-foreground mb-1.5">
         {label}
         {optional && (
           <span className="text-muted-foreground/70 font-normal normal-case"> (optional)</span>
