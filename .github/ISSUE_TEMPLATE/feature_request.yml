@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Have an idea to make PPPC Builder more useful? Describe it here.
+        Have an idea to make MacPPPC more useful? Describe it here.
         For requests to add a new app to the built-in **Known Apps** list, please use the "Add a known app" template instead — it has dedicated fields for the bundle ID and code requirement.
 
   - type: textarea
@@ -36,7 +36,7 @@ body:
     id: scope
     attributes:
       label: Scope
-      description: PPPC Builder is intentionally a zero-build, fully client-side tool. Features that would require a backend, account, or external API are unlikely to be accepted.
+      description: MacPPPC is intentionally a fully client-side tool. Features that would require a backend, account, or external API are unlikely to be accepted.
       options:
         - label: This feature can be implemented entirely client-side (no server, no external API)
           required: true

@@ -1,5 +1,5 @@
 name: Bug report
-description: Something in PPPC Builder isn't working as expected
+description: Something in MacPPPC isn't working as expected
 title: "[Bug] "
 labels: ["bug"]
 body:
@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Thanks for reporting a bug. Please fill in as much detail as you can — it makes the fix faster.
-        PPPC Builder runs entirely in your browser; no data leaves your machine, so issues are usually reproducible from a clean profile.
+        MacPPPC runs entirely in your browser; no data leaves your machine, so issues are usually reproducible from a clean profile.
 
   - type: textarea
     id: summary
@@ -24,7 +24,7 @@ body:
       label: Steps to reproduce
       description: Numbered steps so we can reproduce it locally.
       placeholder: |
-        1. Go to https://www.simsenblog.dk/pppc-builder/
+        1. Go to https://macpppc.com
         2. Click "Upload .zip"
         3. Select Notes.app.zip
         4. ...
