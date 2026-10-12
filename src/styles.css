@@ -1,8 +1,7 @@
 @import "tailwindcss";
 
 @theme inline {
-  /* Tokens live in :root / html.dark below. `inline` makes utilities read
-     var(--card) etc. directly, so scoped overrides like .code-surface work. */
+  /* `inline` makes utilities read the active :root / html.dark tokens directly. */
   --color-background: var(--bg);
   --color-foreground: var(--fg);
   --color-card: var(--card);
@@ -50,8 +49,8 @@
   --destructive: oklch(0.56 0.2 25);
   --warning: oklch(0.6 0.14 65);
 
-  --code-bg: oklch(0.2 0.015 262);
-  --code-chrome: oklch(0.24 0.016 262);
+  --code-bg: var(--card);
+  --code-chrome: var(--card-elevated);
 
   --shadow-soft: 0 1px 2px oklch(0.3 0.02 260 / 0.05), 0 2px 8px oklch(0.3 0.02 260 / 0.04);
   --shadow-lift: 0 12px 32px oklch(0.3 0.02 260 / 0.14);
@@ -59,9 +58,8 @@
   --bg-glow: oklch(0.9 0.05 182 / 0.35);
 }
 
-/* Dark theme; .code-surface keeps the preview editor dark in both themes. */
-html.dark,
-.code-surface {
+/* Dark theme */
+html.dark {
   --bg: oklch(0.17 0.008 262);
   --fg: oklch(0.95 0.005 255);
   --card: oklch(0.205 0.01 262);
@@ -85,11 +83,6 @@ html.dark,
   --shadow-lift: 0 12px 32px oklch(0 0 0 / 0.45);
 
   --bg-glow: oklch(0.32 0.05 182 / 0.22);
-}
-
-.code-surface {
-  color: var(--fg);
-  color-scheme: dark;
 }
 
 html,

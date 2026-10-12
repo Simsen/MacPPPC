@@ -106,7 +106,7 @@ export function Preview({ profiles, onDeploy, deployEnabled }: Props) {
       : 'Download';
 
   return (
-    <div className="code-surface rounded-xl border border-border bg-code shadow-[var(--shadow-lift)] overflow-hidden flex flex-col max-h-[calc(100vh-6.5rem)]">
+    <div className="rounded-xl border border-border bg-code shadow-[var(--shadow-lift)] overflow-hidden flex flex-col max-h-[calc(100vh-6.5rem)]">
       {/* Title bar */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-code-chrome">
         <div className="flex gap-1.5 flex-shrink-0" aria-hidden>
@@ -180,7 +180,7 @@ export function Preview({ profiles, onDeploy, deployEnabled }: Props) {
                     onClick={() =>
                       setOpenMap((m) => ({ ...m, [key]: !m[key] }))
                     }
-                    className="w-full flex items-center gap-2.5 px-4 py-3 text-left hover:bg-white/[0.03] transition"
+                    className="w-full flex items-center gap-2.5 px-4 py-3 text-left hover:bg-card-elevated transition"
                   >
                     {open ? (
                       <ChevronDown className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -197,7 +197,7 @@ export function Preview({ profiles, onDeploy, deployEnabled }: Props) {
                     </div>
                   </button>
                   {open && (
-                    <div className="bg-black/20 border-t border-border">
+                    <div className="bg-code border-t border-border">
                       {permTags.length > 0 && (
                         <div className="px-4 py-2.5 border-b border-border">
                           <div className="section-label mb-1.5">Permissions</div>
