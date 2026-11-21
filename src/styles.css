@@ -31,58 +31,58 @@
   --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
 }
 
-/* Light theme (default) */
+/* Light theme (default) — AutopilotQR palette */
 :root {
-  --bg: oklch(0.975 0.004 250);
-  --fg: oklch(0.21 0.02 262);
-  --card: oklch(1 0 0);
-  --card-elevated: oklch(0.965 0.005 250);
-  --border: oklch(0.915 0.006 255);
-  --border-strong: oklch(0.85 0.01 255);
-  --input: oklch(0.985 0.003 250);
-  --muted: oklch(0.93 0.006 255);
-  --muted-fg: oklch(0.5 0.016 258);
-  --primary: oklch(0.52 0.1 182);
-  --primary-strong: oklch(0.46 0.095 182);
-  --primary-fg: oklch(0.99 0 0);
-  --info: oklch(0.5 0.13 265);
-  --destructive: oklch(0.56 0.2 25);
-  --warning: oklch(0.6 0.14 65);
+  --bg: #f6f7f9;
+  --fg: #0f172a;
+  --card: #ffffff;
+  --card-elevated: #f0f2f5;
+  --border: #dde1e7;
+  --border-strong: #c5ccd6;
+  --input: #fbfcfd;
+  --muted: #e9ecf1;
+  --muted-fg: #5b6474;
+  --primary: #0f62fe;
+  --primary-strong: #0b50d4;
+  --primary-fg: #ffffff;
+  --info: #2a55c9;
+  --destructive: #b42318;
+  --warning: #8a5a00;
 
   --code-bg: var(--card);
   --code-chrome: var(--card-elevated);
 
-  --shadow-soft: 0 1px 2px oklch(0.3 0.02 260 / 0.05), 0 2px 8px oklch(0.3 0.02 260 / 0.04);
-  --shadow-lift: 0 12px 32px oklch(0.3 0.02 260 / 0.14);
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.05), 0 2px 8px rgb(15 23 42 / 0.04);
+  --shadow-lift: 0 12px 32px rgb(15 23 42 / 0.14);
 
-  --bg-glow: oklch(0.9 0.05 182 / 0.35);
+  --bg-glow: rgb(15 98 254 / 0.10);
 }
 
-/* Dark theme */
+/* Dark theme — SIMSENblog palette */
 html.dark {
-  --bg: oklch(0.17 0.008 262);
-  --fg: oklch(0.95 0.005 255);
-  --card: oklch(0.205 0.01 262);
-  --card-elevated: oklch(0.235 0.011 262);
-  --border: oklch(0.285 0.012 262);
-  --border-strong: oklch(0.37 0.014 262);
-  --input: oklch(0.18 0.009 262);
-  --muted: oklch(0.29 0.012 262);
-  --muted-fg: oklch(0.68 0.014 258);
-  --primary: oklch(0.79 0.12 180);
-  --primary-strong: oklch(0.72 0.12 180);
-  --primary-fg: oklch(0.18 0.03 185);
-  --info: oklch(0.74 0.11 265);
-  --destructive: oklch(0.68 0.18 25);
-  --warning: oklch(0.8 0.13 75);
+  --bg: #0d101c;
+  --fg: #e8ebf3;
+  --card: #141929;
+  --card-elevated: #192036;
+  --border: #252b3b;
+  --border-strong: #334568;
+  --input: #10141f;
+  --muted: #202b47;
+  --muted-fg: #959dad;
+  --primary: #547fff;
+  --primary-strong: #3f6bf0;
+  --primary-fg: #091020;
+  --info: #9ab4ff;
+  --destructive: #f87171;
+  --warning: #fbbf24;
 
-  --code-bg: oklch(0.15 0.008 262);
-  --code-chrome: oklch(0.19 0.01 262);
+  --code-bg: #0b0e18;
+  --code-chrome: #111626;
 
-  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.3), 0 2px 8px oklch(0 0 0 / 0.2);
-  --shadow-lift: 0 12px 32px oklch(0 0 0 / 0.45);
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 8px rgb(0 0 0 / 0.2);
+  --shadow-lift: 0 12px 32px rgb(0 0 0 / 0.45);
 
-  --bg-glow: oklch(0.32 0.05 182 / 0.22);
+  --bg-glow: rgb(84 127 255 / 0.14);
 }
 
 html,
